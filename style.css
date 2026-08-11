@@ -37,15 +37,15 @@ section{
 }
 
 .header .nav-bar{
-  width: 90%;
-  min-height: 112px;
+  width: 94%;
+  min-height: 88px;
   margin: auto;
   color: #fff;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   justify-content: flex-start;
-  gap: 40px;
+  gap: 22px;
   border-bottom: 2px solid #fff;
 }
 
@@ -56,10 +56,10 @@ section{
 .header .nav-bar .logo a{
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 112px;
+  gap: 10px;
+  height: 88px;
   font-family: Arial, sans-serif;
-  font-size: 30px;
+  font-size: 20px;
   font-weight: 700;
   text-transform: uppercase;
   color: #fff;
@@ -67,8 +67,8 @@ section{
 }
 
 .header .nav-bar .logo img{
-  width: 76px;
-  height: 76px;
+  width: 58px;
+  height: 58px;
   object-fit: contain;
   display: block;
 }
@@ -78,14 +78,14 @@ section{
 }
 
 .header .nav-bar .menu ul li{
-  margin-right: 24px;
+  margin-right: 8px;
 }
 
 .header .nav-bar .menu ul li a{
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 500;
-  letter-spacing: 2px;
-  padding: 12px 14px;
+  letter-spacing: 1px;
+  padding: 8px 9px;
   border-radius: 5px;
   text-transform: capitalize;  
   transition: all 0.5s ease-in-out;
@@ -110,13 +110,13 @@ section{
 }
 
 .header .nav-bar .social-media ul li i{
-  width: 56px;
-  height: 56px;
-  line-height: 56px;
-  margin-right: 5px;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  margin-right: 3px;
   text-align: center;
   align-items: center;
-  font-size: 23px;
+  font-size: 17px;
   border-radius: 5px;
   background-color: #cac5c542;
   box-shadow: 0 0 25px rgba(24,24,24,.4);
@@ -304,7 +304,7 @@ section{
   min-height: auto;
   overflow: visible;
   background-color: #fff;
-  padding: 72px 5vw 64px;
+  padding: 72px 6vw 64px;
 }
 
 .feature-grid{
@@ -313,7 +313,7 @@ section{
   margin-right: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(260px, 18vw, 340px);
+  gap: clamp(110px, 10vw, 190px);
 }
 
 .feature-item{
@@ -482,7 +482,7 @@ section{
 }
 
 .hub-page{
-  padding-top: 112px;
+  padding-top: 88px;
 }
 
 .hub-hero{
@@ -576,19 +576,19 @@ section{
 
 @media (max-width: 1100px){
   .header .nav-bar{
-    width: 94%;
-    gap: 22px;
-    min-height: 96px;
+    width: 96%;
+    gap: 14px;
+    min-height: 76px;
   }
 
   .header .nav-bar .logo a{
-    height: 96px;
-    font-size: 22px;
+    height: 76px;
+    font-size: 17px;
   }
 
   .header .nav-bar .logo img{
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
   }
 
   .header .nav-bar .menu ul li{
@@ -596,16 +596,16 @@ section{
   }
 
   .header .nav-bar .menu ul li a{
-    font-size: 17px;
+    font-size: 14px;
     letter-spacing: 1px;
-    padding: 8px;
+    padding: 7px;
   }
 
   .header .nav-bar .social-media ul li i{
-    width: 46px;
-    height: 46px;
-    line-height: 46px;
-    font-size: 19px;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 15px;
   }
 
   .hero-sec .caption .hero-logo{
