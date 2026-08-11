@@ -113,7 +113,8 @@ section{
   margin-left: auto;
 }
 
-.header .nav-bar .social-media ul li i{
+.header .nav-bar .social-media ul li i,
+.header .nav-bar .social-media .x-icon{
   width: 40px;
   height: 40px;
   line-height: 40px;
@@ -127,7 +128,15 @@ section{
   transition: all 0.3s ease-in-out;
 }
 
-.header .nav-bar .social-media ul li i:hover{
+.header .nav-bar .social-media .x-icon{
+  display: inline-block;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+}
+
+.header .nav-bar .social-media ul li i:hover,
+.header .nav-bar .social-media .x-icon:hover{
   background-color: #fff;
   color: #000;
 }
@@ -386,6 +395,15 @@ section{
   transition: color 0.3s ease;
 }
 
+.contact-social .x-icon{
+  display: inline-block;
+  color: inherit;
+  font-family: Arial, sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .contact-social a:hover{
   color: #fff;
 }
@@ -605,7 +623,8 @@ section{
     padding: 7px;
   }
 
-  .header .nav-bar .social-media ul li i{
+  .header .nav-bar .social-media ul li i,
+  .header .nav-bar .social-media .x-icon{
     width: 34px;
     height: 34px;
     line-height: 34px;
@@ -663,7 +682,8 @@ section{
     order: 2;
   }
 
-  .header .nav-bar .social-media ul li i{
+  .header .nav-bar .social-media ul li i,
+  .header .nav-bar .social-media .x-icon{
     width: 40px;
     height: 40px;
     line-height: 40px;
