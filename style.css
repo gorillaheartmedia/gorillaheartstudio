@@ -694,6 +694,13 @@ section{
   text-transform: uppercase;
 }
 
+.news-post-video{
+  width: 100%;
+  display: block;
+  margin: 0 0 36px;
+  background-color: #000;
+}
+
 .news-post-copy{
   display: grid;
   gap: 24px;
