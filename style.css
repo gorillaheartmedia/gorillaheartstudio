@@ -524,11 +524,11 @@ section{
 }
 
 .hub-hero{
-  min-height: auto;
+  min-height: 680px;
   overflow: hidden;
   background-color: #0b0b0b;
   color: #fff;
-  padding: 84px 5vw;
+  padding: 0;
 }
 
 .hub-section-video{
@@ -557,15 +557,18 @@ section{
   align-items: center;
   gap: clamp(48px, 7vw, 120px);
   min-height: 520px;
+  padding-top: 84px;
+  padding-bottom: 84px;
   padding-left: min(44vw, 660px);
+  padding-right: 5vw;
 }
 
 .hub-corner-art{
   position: absolute;
-  top: -30px;
-  left: -30px;
+  top: 0;
+  left: 0;
   z-index: 1;
-  width: min(46vw, 700px);
+  width: min(52vw, 790px);
   max-width: none;
   display: block;
   mix-blend-mode: screen;
@@ -939,7 +942,7 @@ section{
   }
 
   .hub-hero{
-    padding: 52px 7vw;
+    min-height: auto;
   }
 
   .hub-hero-inner,
@@ -949,11 +952,15 @@ section{
 
   .hub-hero-inner{
     min-height: auto;
-    padding-left: 0;
+    padding-left: 7vw;
+    padding-right: 7vw;
+    padding-bottom: 52px;
     padding-top: 56vw;
   }
 
   .hub-corner-art{
+    top: 0;
+    left: 0;
     width: min(88vw, 560px);
   }
 
