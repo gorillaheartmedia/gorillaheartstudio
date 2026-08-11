@@ -1,0 +1,139 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/jarallax.css">
+    <link rel="stylesheet" href="style.css">
+    <title> How To Create A Website With Full Screen Background Video </title>
+</head>
+
+<body>
+  <header class="header">
+    <div class="nav-bar">
+      <div class="logo">
+        <a href="index.html">
+          <img src="assets/image/whlogo.png" alt="Gorilla Heart logo">
+          <span>GORILLA HEART MEDIA</span>
+        </a>
+      </div>
+      <div class="menu">
+        <ul>
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="hub.html">Hub</a></li>
+          <li><a href="#">News</a></li>
+          <li><a href="#">Games</a></li>
+          <li><a href="#">Apps</a></li>
+          <li><a href="#">Wiki</a></li>
+          <li><a href="#">About</a></li>
+        </ul>
+      </div>
+      <div class="social-media">
+        <ul>
+          <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+          <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+          <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+          <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <section class="jarallax">
+  <div class="hero-sec">
+    <div class="overlay">
+      <div class="caption">
+        <img class="hero-logo" src="assets/image/whlogo.png" alt="Gorilla Heart logo">
+        <h3>We make things</h3>
+        <p class="description">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+        <div class="btn">
+          <a href="#">Read More</a>
+          <a href="#">Contact Us</a>
+        </div>
+      </div>
+      <img class="video-corner-logo" src="assets/image/logo2.png" alt="Gorilla Heart">
+    </div>
+  </div>
+</section>
+<!-- video background end -->
+
+<section class="latest-news-section">
+  <div class="latest-news-inner">
+    <h2>Latest News</h2>
+    <div class="news-grid">
+      <article class="news-item">
+        <p class="news-date">August 2026</p>
+        <h3>New Gorilla Heart Projects Are In Motion</h3>
+        <p>Updates from Gorilla Heart Media will live here as new games, apps, wiki entries, and creative releases go live.</p>
+        <a href="#">Read More</a>
+      </article>
+      <article class="news-item">
+        <p class="news-date">Coming Soon</p>
+        <h3>Behind The Scenes</h3>
+        <p>Follow development notes, media drops, and progress updates from the Gorilla Heart team.</p>
+        <a href="#">Read More</a>
+      </article>
+      <article class="news-item">
+        <p class="news-date">Featured</p>
+        <h3>Explore The Hub</h3>
+        <p>The hub will collect the latest links, announcements, and featured creations in one place.</p>
+        <a href="#">Read More</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="feature-grid-section">
+  <div class="feature-grid">
+    <a class="feature-item" href="hub.html">
+      <img src="assets/image/hub.png" alt="Gorilla Heart Hub">
+      <span>GORILLA HEART HUB</span>
+    </a>
+    <a class="feature-item" href="#">
+      <img src="assets/image/game.png" alt="Gorilla Heart Games">
+      <span>GORILLA HEART GAMES</span>
+    </a>
+  </div>
+</section>
+
+<section class="contact-section">
+  <div class="contact-inner">
+    <ul class="contact-social">
+      <li><a href="#" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+      <li><a href="#" aria-label="Twitter"><i class="fa fa-twitter"></i></a></li>
+      <li><a href="#" aria-label="Instagram"><i class="fa fa-instagram"></i></a></li>
+      <li><a href="#" aria-label="Email"><i class="fa fa-envelope"></i></a></li>
+    </ul>
+    <h2>Stay in touch</h2>
+    <p class="contact-email">Email us tips gorillaheartmedia@gmail.com</p>
+    <p class="contact-copy">To subscribe to our email newsletter, send us your email address. We'll let you know when there is something big happening.</p>
+    <form class="contact-form">
+      <div class="contact-name-row">
+        <input type="text" name="first-name" placeholder="First Name" aria-label="First Name">
+        <input type="text" name="last-name" placeholder="Last Name" aria-label="Last Name">
+      </div>
+      <input type="email" name="email" placeholder="Email Address" aria-label="Email Address">
+      <button type="submit">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <p>&copy; 2026 Gorilla Heart Media</p>
+</footer>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="assets/js/jarallax.min.js"></script>
+  <script src="assets/js/jarallax-video.min.js"></script>
+  <script type="text/javascript">
+    $('.jarallax').jarallax({
+      speed: 3000,
+      videoSrc: 'mp4:assets/image/title.mp4',
+      videoLoop: true
+    });
+  </script>
+</body>
+
+</html>
