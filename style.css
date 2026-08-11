@@ -7,6 +7,11 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+body{
+  overflow-x: hidden;
+  background-color: #fff;
+}
+
 a, a:hover{
   text-decoration: none;
   color: #fff;
@@ -30,9 +35,8 @@ section{
 .header{
   width: 100%;
   background-color: rgba(0, 0, 0, 0.82);
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
   z-index: 9999;
 }
 
@@ -482,7 +486,7 @@ section{
 }
 
 .hub-page{
-  padding-top: 88px;
+  padding-top: 0;
 }
 
 .hub-hero{
@@ -618,10 +622,6 @@ section{
     min-height: auto;
     padding: 14px 0;
     gap: 14px 18px;
-  }
-
-  .hub-page{
-    padding-top: 194px;
   }
 
   .header .nav-bar .logo{
@@ -807,10 +807,6 @@ section{
 @media (max-width: 420px){
   .header .nav-bar{
     width: 92%;
-  }
-
-  .hub-page{
-    padding-top: 188px;
   }
 
   .header .nav-bar .logo a{
