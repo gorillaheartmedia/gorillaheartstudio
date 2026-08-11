@@ -683,6 +683,10 @@ section{
   color: #050505;
 }
 
+.news-post + .news-post{
+  margin-top: 78px;
+}
+
 .news-post h2{
   color: #050505;
   font-family: Impact, "Arial Black", Arial, sans-serif;
