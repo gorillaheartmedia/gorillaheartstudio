@@ -553,21 +553,20 @@ section{
   width: min(100%, 1500px);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(280px, 0.8fr) minmax(320px, 1fr);
+  grid-template-columns: minmax(320px, 1fr);
   align-items: center;
   gap: clamp(48px, 7vw, 120px);
+  min-height: 520px;
+  padding-left: min(44vw, 660px);
 }
 
-.hub-hero-media{
-  position: relative;
-  overflow: hidden;
-  background-color: transparent;
-}
-
-.hub-hero-media img{
-  position: relative;
+.hub-corner-art{
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 1;
-  width: 100%;
+  width: min(46vw, 700px);
+  max-width: none;
   display: block;
   mix-blend-mode: screen;
 }
@@ -946,6 +945,16 @@ section{
   .hub-hero-inner,
   .hub-links-grid{
     grid-template-columns: 1fr;
+  }
+
+  .hub-hero-inner{
+    min-height: auto;
+    padding-left: 0;
+    padding-top: 56vw;
+  }
+
+  .hub-corner-art{
+    width: min(88vw, 560px);
   }
 
   .hub-hero p{
