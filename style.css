@@ -525,13 +525,31 @@ section{
 
 .hub-hero{
   min-height: auto;
-  overflow: visible;
+  overflow: hidden;
   background-color: #0b0b0b;
   color: #fff;
   padding: 84px 5vw;
 }
 
+.hub-section-video{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.48;
+}
+
+.hub-hero::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.42);
+}
+
 .hub-hero-inner{
+  position: relative;
+  z-index: 1;
   width: min(100%, 1500px);
   margin: 0 auto;
   display: grid;
@@ -543,16 +561,7 @@ section{
 .hub-hero-media{
   position: relative;
   overflow: hidden;
-  background-color: #050505;
-}
-
-.hub-hero-media video{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 1;
+  background-color: transparent;
 }
 
 .hub-hero-media img{
