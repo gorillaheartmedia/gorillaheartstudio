@@ -524,7 +524,24 @@ section{
   gap: clamp(48px, 7vw, 120px);
 }
 
-.hub-hero img{
+.hub-hero-media{
+  position: relative;
+  overflow: hidden;
+  background-color: #050505;
+}
+
+.hub-hero-media video{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+}
+
+.hub-hero-media img{
+  position: relative;
+  z-index: 1;
   width: 100%;
   display: block;
   filter: grayscale(100%);
