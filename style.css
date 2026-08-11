@@ -160,7 +160,7 @@ section{
 }
 
 .hero-sec .caption .hero-logo{
-  width: clamp(1200px, 150vw, 3150px);
+  width: clamp(800px, 100vw, 2100px);
   max-width: none;
   height: auto;
   display: block;
