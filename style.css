@@ -644,6 +644,67 @@ section{
   background-color: #fff;
 }
 
+.news-page{
+  background-color: #fff;
+}
+
+.news-page-hero{
+  min-height: auto;
+  overflow: visible;
+  background-color: #0b0b0b;
+  color: #fff;
+  padding: 86px 6vw 64px;
+}
+
+.news-page-inner{
+  width: min(100%, 1120px);
+  margin: 0 auto;
+}
+
+.news-page-hero h1{
+  color: #fff;
+  font-family: Impact, "Arial Black", Arial, sans-serif;
+  font-size: clamp(72px, 9vw, 150px);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.news-posts-section{
+  min-height: auto;
+  overflow: visible;
+  background-color: #fff;
+  padding: 72px 6vw;
+}
+
+.news-post{
+  border-top: 8px solid #000;
+  color: #050505;
+}
+
+.news-post h2{
+  color: #050505;
+  font-family: Impact, "Arial Black", Arial, sans-serif;
+  font-size: clamp(40px, 5vw, 78px);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: 0;
+  margin: 20px 0 34px;
+  text-transform: uppercase;
+}
+
+.news-post-copy{
+  display: grid;
+  gap: 24px;
+}
+
+.news-post-copy p{
+  color: #202020;
+  font-size: 21px;
+  line-height: 1.7;
+}
+
 .about-hero{
   min-height: auto;
   overflow: visible;
@@ -970,6 +1031,19 @@ section{
 
   .about-hero{
     padding: 54px 7vw;
+  }
+
+  .news-page-hero{
+    padding: 54px 7vw 42px;
+  }
+
+  .news-posts-section{
+    padding: 48px 7vw;
+  }
+
+  .news-post-copy p{
+    font-size: 17px;
+    line-height: 1.6;
   }
 
   .about-copy p{
