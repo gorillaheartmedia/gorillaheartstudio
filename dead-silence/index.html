@@ -1,0 +1,4085 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dead Silence</title>
+  <link rel="icon" href="data:," />
+  <link rel="preload" href="a.otf" as="font" type="font/otf" crossorigin />
+  <style>
+    @font-face{
+      font-family:"DeadTitle";
+      src:url("a.otf") format("opentype");
+      font-weight:400;
+      font-style:normal;
+      font-display:swap;
+    }
+    :root{
+      --gold:#d9c15f;
+      --paper:#c7b089;
+      --paper-deep:#ac9065;
+      --ink:#231711;
+      --muted:#5f4937;
+      --panel:rgba(0,0,0,.72);
+      --panel-line:rgba(125,0,0,.48);
+      --text:#e8e3d7;
+    }
+    *{box-sizing:border-box}
+    html{
+      background:#0f0d0b;
+      scroll-behavior:smooth;
+      height:100%;
+    }
+    body{
+      position:relative;
+      margin:0;
+      min-height:100vh;
+      overflow:hidden;
+      overflow-x:hidden;
+      font-family:Georgia, "Times New Roman", serif;
+      background:#0f0d0b;
+    }
+    .bg-fade{
+      position:fixed;
+      inset:0;
+      z-index:9;
+      pointer-events:none;
+      background:#040302;
+      opacity:0;
+      transition:opacity .9s ease;
+    }
+    .bg-fade.is-active{opacity:1}
+    .bg-fade.is-revealing{opacity:0}
+    .landing{
+      position:fixed;
+      inset:0;
+      z-index:10;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:24px;
+      padding:34px 18px 34px 38px;
+      transition:opacity .9s ease, visibility .9s ease, transform .9s ease;
+    }
+    .landing::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-2;
+      background:url("a.jpeg") center center / cover no-repeat;
+      transform:scale(1.03);
+      transition:opacity .9s ease, transform 1.2s ease;
+    }
+    .landing::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      background:
+        linear-gradient(rgba(8,7,6,.16), rgba(8,7,6,.28)),
+        radial-gradient(circle at 20% 18%, rgba(122,31,28,.1), transparent 28%),
+        radial-gradient(circle at 82% 24%, rgba(216,154,72,.05), transparent 24%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 2px, transparent 2px 6px),
+        linear-gradient(180deg, rgba(31,26,21,.16) 0%, rgba(16,13,10,.3) 100%);
+    }
+    .landing.is-leaving::before{
+      opacity:0;
+    }
+    .landing.is-leaving{
+      opacity:0;
+      visibility:hidden;
+      transform:scale(1.02);
+      pointer-events:none;
+    }
+    .mast{
+      max-width:980px;
+    }
+    @keyframes titleShadowDrift{
+      0%, 100%{ text-shadow:0 11px 16px rgba(23,0,0,1); }
+      50%{ text-shadow:0 71px 16px rgba(23,0,0,1); }
+    }
+    .landing h1{
+      margin:0 0 10px;
+      font-family:"DeadTitle", auto;
+      font-size:clamp(81px, 39vw, 435px);
+      line-height:.84;
+      letter-spacing:0;
+      font-weight:900;
+      text-transform:uppercase;
+      color:var(--gold);
+      text-shadow:0 11px 16px rgba(23,0,0,1);
+      animation:titleShadowDrift 15s ease-in-out infinite;
+    }
+    .sub{
+      margin:0;
+      color:rgba(255,255,255,.94);
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:62px;
+      line-height:1;
+      letter-spacing:.03em;
+      white-space:nowrap;
+    }
+    .enter-wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      flex:0 0 140px;
+    }
+    .enter-circle{
+      width:50px;
+      height:50px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.72);
+      background:rgba(8,7,6,.16);
+      box-shadow:0 18px 40px rgba(0,0,0,.28);
+      cursor:pointer;
+      transition:background .25s ease, transform .18s ease, border-color .25s ease, box-shadow .25s ease;
+      backdrop-filter:blur(3px);
+    }
+    .enter-circle:hover{
+      background:rgba(217,193,95,.92);
+      border-color:rgba(217,193,95,1);
+      box-shadow:0 20px 50px rgba(0,0,0,.36);
+      transform:scale(1.05);
+    }
+    .enter-circle:focus-visible{
+      outline:3px solid rgba(255,255,255,.75);
+      outline-offset:6px;
+    }
+    .timeline-app{
+      position:relative;
+      min-height:100vh;
+      opacity:0;
+      visibility:hidden;
+      transition:opacity .9s ease, visibility .9s ease;
+    }
+    .timeline-app.is-active{
+      opacity:1;
+      visibility:visible;
+    }
+    .artifact-view{
+      position:fixed;
+      inset:0;
+      z-index:11;
+      opacity:0;
+      visibility:hidden;
+      transition:opacity .6s ease, visibility .6s ease;
+      background:
+        linear-gradient(rgba(3,2,2,.88), rgba(7,5,4,.94)),
+        #050403;
+      color:var(--text);
+      overflow:auto;
+    }
+    .artifact-view.is-visible{
+      opacity:1;
+      visibility:visible;
+    }
+    .artifact-view.is-reader-open .artifact-top,
+    .artifact-view.is-reader-open .artifact-browser{
+      opacity:0;
+      pointer-events:none;
+      user-select:none;
+    }
+    .artifact-inner{
+      max-width:1120px;
+      margin:0 auto;
+      padding:clamp(20px, 2.5vw, 34px) clamp(14px, 2vw, 22px) clamp(20px, 3vw, 44px);
+    }
+    .artifact-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:20px;
+      margin-bottom:28px;
+    }
+    .artifact-kicker{
+      margin:0 0 8px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .artifact-title{
+      margin:0 0 8px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:42px;
+      line-height:1;
+      text-transform:uppercase;
+      color:#f0ebe0;
+    }
+    .artifact-sub{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:15px;
+      line-height:1.5;
+      color:#c9c2b6;
+      max-width:760px;
+    }
+    .artifact-close{
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.04);
+      color:#f0ebe0;
+      border-radius:999px;
+      padding:12px 18px;
+      font-family:Arial, Helvetica, sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+    }
+    .artifact-browser{
+      display:grid;
+      grid-template-columns:320px 1fr;
+      gap:18px;
+    }
+    .artifact-selector{
+      display:grid;
+      grid-template-columns:1fr 26px;
+      column-gap:10px;
+      align-items:stretch;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:20px;
+      padding:18px 16px;
+      background:rgba(255,255,255,.04);
+      box-shadow:0 14px 38px rgba(0,0,0,.18);
+    }
+    .artifact-dial-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      grid-column:1 / -1;
+      margin-bottom:14px;
+      font-family:Arial, Helvetica, sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:#c9c2b6;
+      font-size:11px;
+    }
+    .artifact-dial-head strong{
+      font-size:13px;
+      color:#f2df9a;
+      letter-spacing:.12em;
+    }
+    .artifact-dial-window{
+      position:relative;
+      grid-column:1;
+      height:200px;
+      overflow:hidden;
+      mask-image:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.35) 12%, rgba(0,0,0,1) 36%, rgba(0,0,0,1) 64%, rgba(0,0,0,.35) 88%, transparent 100%);
+      -webkit-mask-image:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.35) 12%, rgba(0,0,0,1) 36%, rgba(0,0,0,1) 64%, rgba(0,0,0,.35) 88%, transparent 100%);
+    }
+    .artifact-dial-window::before,
+    .artifact-dial-window::after{
+      content:"";
+      position:absolute;
+      left:10px;
+      right:10px;
+      height:1px;
+      background:rgba(217,193,95,.28);
+      pointer-events:none;
+      z-index:1;
+    }
+    .artifact-dial-window::before{ top:76px; }
+    .artifact-dial-window::after{ top:124px; }
+    .artifact-dial-stack{
+      position:absolute;
+      inset:0;
+      will-change:transform;
+      transition:transform .16s ease;
+    }
+    .artifact-dial-item{
+      height:50px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 12px;
+      text-align:center;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:18px;
+      color:rgba(240,235,224,.38);
+      transition:color .16s ease, opacity .16s ease, transform .16s ease;
+    }
+    .artifact-dial-item.is-active{
+      color:#f0ebe0;
+      opacity:1;
+      transform:scale(1.02);
+    }
+    .artifact-dial-track{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      grid-column:2;
+      height:200px;
+      gap:14px;
+      padding:0;
+    }
+    .artifact-step-dot{
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,.65);
+      background:radial-gradient(circle at 35% 35%, #f7efcf 0 18%, #d9c15f 19% 56%, #7d6d2d 57% 100%);
+      box-shadow:0 0 0 3px rgba(0,0,0,.36);
+      cursor:pointer;
+      transition:transform .14s ease, box-shadow .14s ease, opacity .14s ease;
+    }
+    .artifact-step-dot:hover{
+      transform:scale(1.08);
+      box-shadow:0 0 0 3px rgba(0,0,0,.42), 0 0 10px rgba(217,193,95,.32);
+    }
+    .artifact-step-dot:disabled{
+      opacity:.28;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:0 0 0 2px rgba(0,0,0,.28);
+    }
+    .artifact-panel{
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:20px;
+      padding:22px;
+      background:rgba(255,255,255,.04);
+      box-shadow:0 14px 38px rgba(0,0,0,.18);
+    }
+    .artifact-meta{
+      margin:0 0 10px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .artifact-panel h3{
+      margin:0 0 10px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:28px;
+      color:#f0ebe0;
+    }
+    .artifact-panel p{
+      margin:0 0 18px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:15px;
+      line-height:1.6;
+      color:#d4cdc1;
+    }
+    .artifact-facts{
+      margin:0 0 18px;
+      padding:0;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .artifact-facts li{
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:14px;
+      line-height:1.45;
+      color:#d4cdc1;
+    }
+    .artifact-facts strong{
+      color:#f2df9a;
+      font-weight:600;
+    }
+    .artifact-tape-feature{
+      position:relative;
+      min-height:260px;
+      margin:0 0 18px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      background:#050403 url("bg1.png") center / cover no-repeat;
+      box-shadow:inset 0 0 70px rgba(0,0,0,.58), 0 18px 42px rgba(0,0,0,.28);
+    }
+    .artifact-tape-feature::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.56));
+      pointer-events:none;
+    }
+    .artifact-tape-image{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:min(72%, 430px);
+      max-height:82%;
+      object-fit:contain;
+      transform:translate(-50%, -50%) rotate(-3deg);
+      filter:drop-shadow(0 20px 28px rgba(0,0,0,.58));
+    }
+    .artifact-tape-play{
+      position:absolute;
+      left:50%;
+      bottom:24px;
+      min-width:124px;
+      min-height:44px;
+      padding:0 18px;
+      border:1px solid rgba(242,223,154,.72);
+      border-radius:999px;
+      background:rgba(5,4,3,.78);
+      color:#f2df9a;
+      box-shadow:0 10px 24px rgba(0,0,0,.42), 0 0 18px rgba(217,193,95,.18);
+      transform:translateX(-50%);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+    .artifact-tape-play.is-playing{
+      background:rgba(37,29,13,.88);
+      color:#fff4bd;
+    }
+    .artifact-enter{
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.04);
+      color:#f0ebe0;
+      border-radius:999px;
+      padding:10px 16px;
+      font-family:Arial, Helvetica, sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+    }
+    .artifact-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .artifact-model{
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.04);
+      color:#f0ebe0;
+      border-radius:999px;
+      padding:10px 16px;
+      font-family:Arial, Helvetica, sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+    }
+    .artifact-playlist{
+      margin:0 0 16px;
+      padding:10px 0 0;
+      border-top:1px solid rgba(255,255,255,.1);
+    }
+    .artifact-playlist p{
+      margin:0 0 8px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:11px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .artifact-playlist ul{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .artifact-playlist button{
+      width:100%;
+      text-align:left;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:10px 12px;
+      background:rgba(255,255,255,.03);
+      color:#e8e1d3;
+      font-family:Arial, Helvetica, sans-serif;
+      letter-spacing:.05em;
+      cursor:pointer;
+    }
+    .artifact-sublist{
+      display:none;
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .artifact-sublist.is-visible{
+      display:block;
+    }
+    .artifact-sublist h4{
+      margin:0 0 12px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:12px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .artifact-sublist ul{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .artifact-sublist li{
+      padding:12px 14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      font-family:Arial, Helvetica, sans-serif;
+      color:#d4cdc1;
+    }
+    .artifact-sublist strong{
+      display:block;
+      margin-bottom:4px;
+      color:#f0ebe0;
+      font-size:15px;
+    }
+    .artifact-subcopy{
+      white-space:pre-line;
+      line-height:1.6;
+    }
+    .artifact-subbutton{
+      width:100%;
+      text-align:left;
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      padding:12px 14px;
+      color:#d4cdc1;
+      font-family:Arial, Helvetica, sans-serif;
+      cursor:pointer;
+      transition:background .2s ease, border-color .2s ease;
+    }
+    .artifact-subbutton:hover{
+      background:rgba(217,193,95,.08);
+      border-color:rgba(217,193,95,.35);
+    }
+    .artifact-reader{
+      position:fixed;
+      inset:0;
+      z-index:30;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:#000;
+      overflow:hidden;
+    }
+    .artifact-reader.has-journal-paper{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      background:#000;
+      justify-content:flex-start;
+      align-items:flex-start;
+      padding:28px 24px;
+    }
+    .artifact-reader.has-journal-paper::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background:url("messer.png") right center / contain no-repeat;
+      opacity:.9;
+    }
+    .artifact-reader.is-visible{
+      display:flex;
+    }
+    .artifact-reader-card{
+      position:relative;
+      width:min(920px, 100%);
+      max-height:85vh;
+      overflow:auto;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:20px;
+      padding:22px;
+      background:linear-gradient(rgba(9,7,6,.96), rgba(13,10,8,.96));
+      box-shadow:0 20px 60px rgba(0,0,0,.45);
+    }
+    .artifact-reader.has-journal-paper .artifact-reader-card{
+      position:relative;
+      z-index:1;
+      width:min(760px, calc(100vw - 48px));
+      height:calc(100vh - 56px);
+      max-height:calc(100vh - 56px);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      background:#000;
+      border-color:rgba(255,255,255,.28);
+      box-shadow:0 22px 64px rgba(0,0,0,.68);
+    }
+    .artifact-reader.has-journal-paper .artifact-reader-head{
+      background:#000;
+    }
+    .artifact-reader.has-journal-paper .artifact-reader-body{
+      background:#000;
+      color:#e6decf;
+      flex:1 1 auto;
+      overflow:auto;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(217,193,95,.72) rgba(255,255,255,.08);
+    }
+    .artifact-reader.has-journal-paper .artifact-reader-body::-webkit-scrollbar{
+      width:10px;
+    }
+    .artifact-reader.has-journal-paper .artifact-reader-body::-webkit-scrollbar-track{
+      background:rgba(255,255,255,.08);
+      border-radius:999px;
+    }
+    .artifact-reader.has-journal-paper .artifact-reader-body::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg, rgba(247,239,207,.9), rgba(217,193,95,.78));
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.35);
+    }
+    .artifact-reader.has-journal-paper .artifact-reader-body::-webkit-scrollbar-thumb:hover{
+      background:linear-gradient(180deg, rgba(247,239,207,1), rgba(217,193,95,.95));
+    }
+    .artifact-reader.has-journal-paper .artifact-reader-close{
+      background:#000;
+      border-color:rgba(255,255,255,.35);
+    }
+    .artifact-reader.has-tape-player{
+      padding:0;
+      align-items:stretch;
+      justify-content:stretch;
+      background:#050403 url("bg1.png") center / cover no-repeat;
+    }
+    .artifact-reader.has-tape-player::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,.78), rgba(0,0,0,.42) 46%, rgba(0,0,0,.18)),
+        radial-gradient(circle at 74% 48%, rgba(242,223,154,.14), transparent 30%);
+    }
+    .artifact-reader.has-tape-player .artifact-reader-card{
+      position:relative;
+      z-index:1;
+      width:100%;
+      max-height:none;
+      min-height:100vh;
+      border:0;
+      border-radius:0;
+      padding:28px 32px;
+      overflow:hidden;
+      background:transparent;
+      box-shadow:none;
+      display:grid;
+      grid-template-columns:minmax(320px, 42vw) 1fr;
+      grid-template-rows:auto 1fr;
+      gap:22px;
+    }
+    .artifact-reader.has-tape-player .artifact-reader-head{
+      grid-column:1 / -1;
+      margin:0;
+    }
+    .artifact-tape-reader-layout{
+      display:grid;
+      grid-template-columns:minmax(320px, 42vw) 1fr;
+      gap:24px;
+      min-height:0;
+      align-items:center;
+    }
+    .artifact-reader.has-tape-player .artifact-reader-body{
+      grid-column:1 / -1;
+      min-height:0;
+    }
+    .artifact-tape-reader-copy{
+      align-self:stretch;
+      overflow:auto;
+      padding:24px;
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:18px;
+      background:rgba(0,0,0,.72);
+      box-shadow:0 20px 54px rgba(0,0,0,.34);
+      white-space:pre-line;
+    }
+    .artifact-tape-reader-copy p{
+      margin:0 0 16px;
+      color:#ddd4c5;
+    }
+    .artifact-tape-reader-stage{
+      position:relative;
+      min-height:calc(100vh - 156px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .artifact-tape-reader-image{
+      width:min(78vw, 780px);
+      max-width:100%;
+      max-height:calc(100vh - 180px);
+      object-fit:contain;
+      filter:drop-shadow(0 34px 44px rgba(0,0,0,.64));
+    }
+    .artifact-tape-reader-stage .artifact-tape-play{
+      bottom:clamp(18px, 7vh, 72px);
+    }
+    .artifact-reader-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:14px;
+    }
+    .artifact-reader-head p{
+      margin:0 0 8px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .artifact-reader-head h4{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:28px;
+      color:#f0ebe0;
+      line-height:1.2;
+    }
+    .artifact-reader-close{
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.04);
+      color:#f0ebe0;
+      border-radius:999px;
+      padding:10px 16px;
+      font-family:Arial, Helvetica, sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .artifact-reader-body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:15px;
+      line-height:1.65;
+      color:#ddd4c5;
+    }
+    .artifact-reader-copy{
+      white-space:pre-line;
+    }
+    .artifact-reader-actions{
+      display:flex;
+      gap:12px;
+      margin-top:18px;
+      flex-wrap:wrap;
+    }
+    .artifact-gallery-launch{
+      border:1px solid rgba(217,193,95,.38);
+      background:rgba(217,193,95,.08);
+      color:#f2df9a;
+      border-radius:999px;
+      padding:12px 18px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      cursor:pointer;
+      transition:background .2s ease, border-color .2s ease, transform .2s ease;
+    }
+    .artifact-gallery-launch:hover{
+      background:rgba(217,193,95,.16);
+      border-color:rgba(217,193,95,.62);
+      transform:translateY(-1px);
+    }
+    .artifact-gallery-note{
+      margin:20px 0 0;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#b9ae96;
+    }
+    .photo-gallery{
+      position:fixed;
+      inset:0;
+      z-index:32;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(110,20,12,.2), transparent 28%),
+        radial-gradient(circle at 82% 18%, rgba(217,193,95,.08), transparent 22%),
+        linear-gradient(rgba(3,2,2,.88), rgba(7,5,4,.95)),
+        #050403;
+      backdrop-filter:blur(10px);
+    }
+    .photo-gallery.is-visible{
+      display:flex;
+    }
+    .photo-gallery-card{
+      width:min(1280px, 100%);
+      min-height:min(86vh, 880px);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:26px;
+      background:
+        linear-gradient(rgba(8,7,6,.18), rgba(8,7,6,.32)),
+        radial-gradient(circle at 20% 18%, rgba(122,31,28,.12), transparent 30%),
+        radial-gradient(circle at 82% 22%, rgba(216,154,72,.05), transparent 24%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 2px, transparent 2px 7px),
+        linear-gradient(180deg, rgba(13,10,8,.98), rgba(7,5,4,.98));
+      box-shadow:0 24px 72px rgba(0,0,0,.58);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .photo-gallery-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      padding:20px 22px 12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+    }
+    .photo-gallery-head p{
+      margin:0 0 6px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .photo-gallery-head h4{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:24px;
+      line-height:1.2;
+      color:#f0ebe0;
+    }
+    .photo-gallery-close{
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.04);
+      color:#f0ebe0;
+      border-radius:999px;
+      padding:10px 16px;
+      font-family:Arial, Helvetica, sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .photo-gallery-stage{
+      position:relative;
+      flex:1 1 auto;
+      min-height:560px;
+      overflow:hidden;
+      padding:18px 18px 72px;
+      background:
+        radial-gradient(circle at center, rgba(120,25,18,.08), transparent 38%),
+        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.24));
+    }
+    .photo-carousel{
+      position:relative;
+      width:100%;
+      height:100%;
+      min-height:480px;
+      overflow:hidden;
+      perspective:1800px;
+      transform-style:preserve-3d;
+    }
+    .photo-slide{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:min(38vw, 520px);
+      height:min(60vh, 520px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity:0;
+      transform:translate3d(-50%, -50%, -320px) rotateY(0deg) scale(.78);
+      transition:transform .9s cubic-bezier(.22,.7,0,1), opacity .7s ease, filter .7s ease;
+      filter:brightness(.52);
+      pointer-events:none;
+    }
+    .photo-slide .img-wrap{
+      position:relative;
+      width:100%;
+      height:100%;
+    }
+    .photo-slide img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      transition:transform .6s ease, filter .6s ease;
+    }
+    .photo-slide .img-text{
+      position:absolute;
+      inset:auto 0 0 0;
+      padding:14px 0 0;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#f0ebe0;
+      background:none;
+      text-shadow:0 2px 14px rgba(0,0,0,.9);
+    }
+    .photo-slide.selected{
+      opacity:1;
+      transform:translate3d(-50%, -50%, 0) rotateY(0deg) scale(1);
+      filter:brightness(1);
+      z-index:10;
+      pointer-events:auto;
+    }
+    .photo-slide.selected:hover img{
+      transform:scale(1.05);
+      filter:brightness(.9);
+    }
+    .photo-slide.prev{
+      opacity:1;
+      transform:translate3d(calc(-50% - 270px), -50%, -140px) rotateY(44deg) scale(.84);
+      z-index:6;
+    }
+    .photo-slide.next{
+      opacity:1;
+      transform:translate3d(calc(-50% + 270px), -50%, -140px) rotateY(-44deg) scale(.84);
+      z-index:6;
+    }
+    .photo-slide.prevLeftSecond{
+      opacity:.68;
+      transform:translate3d(calc(-50% - 450px), -50%, -300px) rotateY(64deg) scale(.68);
+      z-index:3;
+    }
+    .photo-slide.nextRightSecond{
+      opacity:.68;
+      transform:translate3d(calc(-50% + 450px), -50%, -300px) rotateY(-64deg) scale(.68);
+      z-index:3;
+    }
+    .photo-slide.hideLeft{
+      opacity:0;
+      transform:translate3d(calc(-50% - 650px), -50%, -520px) rotateY(76deg) scale(.56);
+      z-index:1;
+    }
+    .photo-slide.hideRight{
+      opacity:0;
+      transform:translate3d(calc(-50% + 650px), -50%, -520px) rotateY(-76deg) scale(.56);
+      z-index:1;
+    }
+    .photo-gallery-controls{
+      position:absolute;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .photo-gallery-btn{
+      width:46px;
+      height:46px;
+      border-radius:50%;
+      border:1px solid rgba(217,193,95,.42);
+      background:rgba(255,255,255,.04);
+      color:#f2df9a;
+      font-size:18px;
+      cursor:pointer;
+      transition:background .2s ease, transform .2s ease, border-color .2s ease;
+    }
+    .photo-gallery-btn:hover{
+      background:rgba(217,193,95,.14);
+      border-color:rgba(217,193,95,.74);
+      transform:translateY(-1px);
+    }
+    .photo-gallery-count{
+      min-width:82px;
+      text-align:center;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:12px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#d8ccb1;
+    }
+    .model-viewer{
+      position:fixed;
+      inset:0;
+      z-index:13;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:rgba(2,2,2,.9);
+    }
+    .model-viewer.is-visible{
+      display:flex;
+    }
+    .model-viewer-card{
+      width:min(1100px, 100%);
+      height:min(82vh, 860px);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:20px;
+      background:linear-gradient(rgba(9,7,6,.96), rgba(13,10,8,.96));
+      box-shadow:0 20px 60px rgba(0,0,0,.45);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+    .model-viewer-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      padding:16px 18px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .model-viewer-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .model-toggle{
+      border:1px solid rgba(217,193,95,.4);
+      background:rgba(217,193,95,.08);
+      color:#f2df9a;
+      border-radius:999px;
+      padding:10px 16px;
+      font-family:Arial, Helvetica, sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+    }
+    .model-viewer-head p{
+      margin:0 0 6px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .model-viewer-head h4{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:22px;
+      color:#f0ebe0;
+      line-height:1.2;
+    }
+    .model-viewer-close{
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.04);
+      color:#f0ebe0;
+      border-radius:999px;
+      padding:10px 16px;
+      font-family:Arial, Helvetica, sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .model-viewer-stage{
+      position:relative;
+      flex:1;
+      min-height:0;
+    }
+    .model-viewer-stage.has-track-panel .model-canvas{
+      right:300px;
+    }
+    .model-canvas{
+      position:absolute;
+      inset:0;
+    }
+    .model-track-panel{
+      position:absolute;
+      right:0;
+      top:0;
+      bottom:0;
+      width:300px;
+      padding:14px;
+      border-left:1px solid rgba(255,255,255,.1);
+      background:rgba(8,7,6,.85);
+      overflow:auto;
+    }
+    .model-track-panel p{
+      margin:0 0 8px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:11px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .model-track-panel ul{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .model-track-panel button{
+      width:100%;
+      text-align:left;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:10px 12px;
+      background:rgba(255,255,255,.03);
+      color:#e8e1d3;
+      font-family:Arial, Helvetica, sans-serif;
+      letter-spacing:.05em;
+      cursor:pointer;
+    }
+    .model-status{
+      position:absolute;
+      left:14px;
+      bottom:12px;
+      margin:0;
+      padding:8px 10px;
+      border-radius:10px;
+      background:rgba(0,0,0,.45);
+      color:#ddd4c5;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:12px;
+      letter-spacing:.05em;
+    }
+    .model-screen-overlay{
+      position:absolute;
+      z-index:5;
+      width:220px;
+      padding:8px;
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:10px;
+      background:rgba(5,5,5,.72);
+      backdrop-filter:blur(2px);
+      color:#e8e1d3;
+      pointer-events:auto;
+      transform:translate(-50%, -50%);
+    }
+    .model-screen-overlay p{
+      margin:0 0 6px;
+      font-family:Consolas, "Courier New", monospace;
+      font-size:10px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#7dff9b;
+      opacity:.9;
+    }
+    .model-screen-overlay ul{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .model-screen-overlay button{
+      width:100%;
+      text-align:left;
+      border:1px solid rgba(125,255,155,.16);
+      border-radius:4px;
+      padding:4px 6px;
+      background:transparent;
+      color:#7dff9b;
+      font-family:Consolas, "Courier New", monospace;
+      font-size:11px;
+      letter-spacing:.04em;
+      line-height:1.3;
+      cursor:pointer;
+      transition:background .12s linear, color .12s linear, border-color .12s linear;
+    }
+    .model-screen-overlay button:hover{
+      border-color:rgba(125,255,155,.35);
+      background:rgba(0,0,0,.45);
+    }
+    .model-screen-overlay button.is-active{
+      background:#000;
+      color:#f5ffb6;
+      border-color:rgba(245,255,182,.45);
+    }
+    .timeline-bg{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      opacity:0;
+      transition:opacity .5s ease;
+      background:#000;
+      overflow:hidden;
+    }
+    .timeline-bg.is-visible{
+      opacity:1;
+    }
+    .timeline-bg-layer{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      transition:opacity .7s ease;
+      background:
+        linear-gradient(rgba(0,0,0,.62), rgba(0,0,0,.9)),
+        radial-gradient(circle at 20% 25%, var(--bg-accent, rgba(122,31,28,.12)), transparent 30%),
+        var(--bg-image, url("a.jpeg")) center center / cover no-repeat,
+        #000;
+      transform:scale(1.02);
+    }
+    .timeline-bg-layer.is-visible{
+      opacity:1;
+    }
+    .timeline-overlay{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+    }
+    .timeline-header{
+      margin:0;
+      padding:0 20px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:20px;
+      line-height:44px;
+      color:#d5d1c8;
+      background:var(--panel);
+      border-bottom:1px solid var(--panel-line);
+      letter-spacing:.04em;
+    }
+    .timeline-header span{
+      color:#bb1c1c;
+    }
+    .timeline-content{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:20px;
+      padding:20px;
+      background:var(--panel);
+      border-top:1px solid var(--panel-line);
+      color:var(--text);
+      max-height:min(48vh, 420px);
+      overflow:auto;
+    }
+    .timeline-nav{
+      position:absolute;
+      top:78px;
+      left:50%;
+      z-index:2;
+      width:min(1380px, calc(100vw - 8px));
+      transform:translateX(-50%);
+      padding:0 4px;
+    }
+    .timeline-dial{
+      position:relative;
+      padding:20px 0 0;
+    }
+    .timeline-line{
+      position:absolute;
+      left:0;
+      right:0;
+      top:34px;
+      height:1px;
+      background:linear-gradient(90deg, rgba(255,255,255,.08), rgba(217,193,95,.55), rgba(255,255,255,.08));
+    }
+    .timeline-signal{
+      position:absolute;
+      left:0;
+      top:34px;
+      height:1px;
+      width:0%;
+      background:linear-gradient(90deg, rgba(217,193,95,.22), rgba(217,193,95,.95));
+      box-shadow:0 0 12px rgba(217,193,95,.42);
+      pointer-events:none;
+      transition:width .08s linear;
+    }
+    .timeline-readout{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:16px;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#dad4c9;
+      font-size:11px;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      opacity:.72;
+    }
+    .timeline-readout strong{
+      font-size:14px;
+      color:#f5e7b0;
+      letter-spacing:.12em;
+    }
+    .timeline-readout em{
+      font-style:normal;
+      color:rgba(255,255,255,.54);
+      letter-spacing:.12em;
+    }
+    .timeline-range{
+      -webkit-appearance:none;
+      appearance:none;
+      width:100%;
+      margin:0;
+      background:transparent;
+      position:relative;
+      z-index:2;
+      cursor:ew-resize;
+    }
+    .timeline-range:focus{
+      outline:none;
+    }
+    .timeline-range::-webkit-slider-runnable-track{
+      height:28px;
+      background:transparent;
+    }
+    .timeline-range::-moz-range-track{
+      height:28px;
+      background:transparent;
+      border:0;
+    }
+    .timeline-range::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:12px;
+      height:12px;
+      margin-top:8px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,.8);
+      background:radial-gradient(circle at 35% 35%, #f7efcf 0 20%, #d9c15f 21% 58%, #7d6d2d 59% 100%);
+      box-shadow:0 0 0 3px rgba(0,0,0,.42), 0 0 12px rgba(217,193,95,.18);
+      cursor:pointer;
+    }
+    .timeline-range::-moz-range-thumb{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,.8);
+      background:radial-gradient(circle at 35% 35%, #f7efcf 0 20%, #d9c15f 21% 58%, #7d6d2d 59% 100%);
+      box-shadow:0 0 0 3px rgba(0,0,0,.42), 0 0 12px rgba(217,193,95,.18);
+      cursor:pointer;
+    }
+    .timeline-marks{
+      position:relative;
+      height:58px;
+      margin-top:4px;
+    }
+    .timeline-mark{
+      position:absolute;
+      top:0;
+      transform:translateX(-50%);
+      border:0;
+      background:transparent;
+      color:#d9d4c9;
+      cursor:pointer;
+      font-family:Arial, Helvetica, sans-serif;
+      text-align:center;
+      padding:0;
+      min-width:88px;
+    }
+    .timeline-mark::before{
+      content:"";
+      display:block;
+      width:1px;
+      height:10px;
+      margin:0 auto 10px;
+      background:#0b0a09;
+      box-shadow:0 0 0 1px rgba(255,255,255,.24);
+      transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .timeline-mark:hover::before,
+    .timeline-mark.is-active::before{
+      transform:scaleY(1.4);
+      background:var(--gold);
+      box-shadow:0 0 0 1px var(--gold);
+    }
+    .timeline-mark strong{
+      display:block;
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.58);
+    }
+    .timeline-mark span{
+      display:block;
+      margin-top:6px;
+      font-size:13px;
+      line-height:1.35;
+      color:#e7e0d1;
+      opacity:.62;
+      transition:opacity .2s ease, color .2s ease;
+    }
+    .timeline-mark.is-active span,
+    .timeline-mark:hover span{
+      opacity:1;
+      color:#fff4ce;
+    }
+    .date-block{
+      float:left;
+      padding:10px 18px 10px 0;
+      text-align:center;
+      min-width:125px;
+    }
+    .month-dial{
+      position:relative;
+      width:92px;
+      height:92px;
+      margin:0 auto 6px;
+      overflow:hidden;
+      mask-image:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.3) 16%, rgba(0,0,0,1) 36%, rgba(0,0,0,1) 64%, rgba(0,0,0,.3) 84%, transparent 100%);
+      -webkit-mask-image:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.3) 16%, rgba(0,0,0,1) 36%, rgba(0,0,0,1) 64%, rgba(0,0,0,.3) 84%, transparent 100%);
+    }
+    .month-dial::before,
+    .month-dial::after{
+      content:"";
+      position:absolute;
+      left:12px;
+      right:12px;
+      height:1px;
+      background:rgba(217,193,95,.35);
+      pointer-events:none;
+    }
+    .month-dial::before{ top:31px; }
+    .month-dial::after{ top:61px; }
+    .month-stack{
+      position:absolute;
+      left:0;
+      right:0;
+      top:0;
+      will-change:transform;
+      transition:transform .12s linear;
+    }
+    .month-item,
+    .date-block .day-name{
+      display:block;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:30px;
+      line-height:1.1;
+      color:rgba(220,220,220,.72);
+      text-transform:uppercase;
+    }
+    .month-item{
+      height:30px;
+      line-height:30px;
+      letter-spacing:.08em;
+      opacity:.28;
+    }
+    .date-block .date-number{
+      display:block;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:82px;
+      line-height:.92;
+      color:rgba(236,236,236,.94);
+      font-weight:700;
+    }
+    .details{
+      overflow:hidden;
+      min-height:180px;
+    }
+    .details-inner{
+      max-width:980px;
+    }
+    .eyeline{
+      display:inline-block;
+      margin-bottom:10px;
+      padding:10px 14px;
+      border:1px solid var(--panel-line);
+      border-radius:12px 12px 0 12px;
+      background:rgba(0,0,0,.34);
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:#f2df9a;
+    }
+    .details h2{
+      margin:0 0 10px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:44px;
+      line-height:1;
+      color:#ededed;
+      text-transform:uppercase;
+    }
+    .details .year{
+      margin:0 0 10px;
+      color:#c2bfb7;
+      font-size:14px;
+      font-style:italic;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+    .details .desc{
+      margin:0 0 18px;
+      max-width:900px;
+      color:#dedede;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:16px;
+      line-height:1.55;
+    }
+    .detail-list{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      padding:0;
+      margin:0;
+      list-style:none;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+    .detail-list li{
+      padding:8px 18px;
+      border:1px solid rgba(153,153,153,.68);
+      border-radius:10px;
+      color:#ededed;
+      background:rgba(0,0,0,.18);
+    }
+    .detail-list .notes{
+      border:0;
+      padding-left:0;
+      color:#cfc9be;
+    }
+    .artifact-audio{
+      margin:0 0 16px;
+      padding:10px 0 0;
+      border-top:1px solid rgba(255,255,255,.1);
+    }
+    .artifact-audio p{
+      margin:0 0 8px;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:11px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#f2df9a;
+    }
+    .artifact-audio audio{
+      width:min(460px, 100%);
+      display:block;
+    }
+    @media (max-width: 1280px){
+      .landing{
+        padding:26px 16px 26px 26px;
+      }
+      .landing h1{
+        font-size:clamp(72px, 33vw, 320px);
+      }
+      .sub{
+        font-size:clamp(24px, 4.5vw, 54px);
+      }
+      .timeline-nav{
+        width:calc(100vw - 16px);
+      }
+      .details h2{
+        font-size:clamp(30px, 3.2vw, 40px);
+      }
+    }
+    @media (max-width: 1100px){
+      .landing{
+        flex-direction:column;
+        justify-content:flex-start;
+      }
+      .sub{
+        font-size:clamp(24px, 5vw, 62px);
+        white-space:normal;
+      }
+      .enter-wrap{
+        min-height:auto;
+        width:100%;
+        justify-content:flex-start;
+      }
+      .timeline-nav{
+        width:calc(100vw - 4px);
+      }
+      .timeline-content{
+        max-height:min(50vh, 460px);
+      }
+      .artifact-title{
+        font-size:clamp(28px, 5vw, 42px);
+      }
+      .artifact-sub{
+        max-width:none;
+      }
+      .artifact-browser{
+        grid-template-columns:280px 1fr;
+      }
+      .model-viewer-card{
+        width:min(980px, 100%);
+        height:min(84vh, 760px);
+      }
+    }
+    @media (max-width: 980px){
+      .timeline-overlay{
+        padding-top:88px;
+      }
+      .timeline-header{
+        font-size:16px;
+        line-height:36px;
+        padding:0 14px;
+      }
+      .timeline-content{
+        bottom:8px;
+        padding:14px;
+        max-height:min(56vh, 520px);
+      }
+      .timeline-readout{
+        font-size:10px;
+        letter-spacing:.14em;
+        gap:10px;
+      }
+      .timeline-readout strong{
+        font-size:12px;
+      }
+      .timeline-mark{
+        min-width:72px;
+      }
+      .timeline-mark span{
+        font-size:11px;
+      }
+      .date-block{
+        min-width:108px;
+      }
+      .date-block .date-number{
+        font-size:64px;
+      }
+      .artifact-browser{
+        grid-template-columns:1fr;
+      }
+      .artifact-panel{
+        padding:16px;
+      }
+      .artifact-panel h3{
+        font-size:24px;
+      }
+      .artifact-reader-card{
+        max-height:88vh;
+      }
+      .photo-gallery{
+        padding:12px;
+      }
+      .photo-gallery-card{
+        min-height:78vh;
+      }
+      .photo-slide{
+        width:min(42vw, 360px);
+        height:min(54vh, 420px);
+      }
+      .photo-slide.prev{
+        transform:translate3d(calc(-50% - 210px), -50%, -120px) rotateY(40deg) scale(.8);
+      }
+      .photo-slide.next{
+        transform:translate3d(calc(-50% + 210px), -50%, -120px) rotateY(-40deg) scale(.8);
+      }
+      .photo-slide.prevLeftSecond{
+        transform:translate3d(calc(-50% - 340px), -50%, -250px) rotateY(58deg) scale(.64);
+      }
+      .photo-slide.nextRightSecond{
+        transform:translate3d(calc(-50% + 340px), -50%, -250px) rotateY(-58deg) scale(.64);
+      }
+      .model-viewer{
+        padding:10px;
+      }
+      .model-viewer-card{
+        width:100%;
+        height:86vh;
+      }
+      .model-viewer-head{
+        padding:12px 12px;
+      }
+      .model-viewer-head h4{
+        font-size:18px;
+      }
+    }
+    @media (max-width: 760px){
+      .timeline-header{
+        font-size:15px;
+        line-height:36px;
+      }
+      .timeline-content{
+        bottom:0;
+        padding:16px;
+      }
+      .timeline-nav{
+        top:52px;
+        width:calc(100vw - 2px);
+        padding:0 4px;
+      }
+      .timeline-nav::before{
+        display:none;
+      }
+      .timeline-marks{
+        height:52px;
+      }
+      .timeline-mark::before{
+        margin-bottom:8px;
+      }
+      .timeline-mark strong{
+        font-size:9px;
+        letter-spacing:.12em;
+      }
+      .timeline-mark span{
+        font-size:10px;
+      }
+      .date-block{
+        float:none;
+        display:flex;
+        align-items:flex-end;
+        gap:10px;
+        min-width:0;
+        padding:0 0 12px;
+        text-align:left;
+      }
+      .month-dial{
+        width:66px;
+        height:66px;
+        margin:0;
+      }
+      .month-dial::before{ top:21px; left:8px; right:8px; }
+      .month-dial::after{ top:43px; left:8px; right:8px; }
+      .month-item,
+      .date-block .day-name{
+        font-size:18px;
+      }
+      .month-item{
+        height:22px;
+        line-height:22px;
+      }
+      .date-block .date-number{
+        font-size:52px;
+      }
+      .details h2{
+        font-size:28px;
+      }
+      .details .desc{
+        font-size:14px;
+      }
+      .timeline-overlay{
+        padding-top:92px;
+      }
+      .artifact-browser{
+        grid-template-columns:1fr;
+      }
+      .artifact-top{
+        flex-direction:column;
+      }
+      .artifact-dial-window{
+        height:160px;
+      }
+      .artifact-dial-track{
+        height:160px;
+      }
+      .artifact-dial-window::before{ top:56px; }
+      .artifact-dial-window::after{ top:104px; }
+      .artifact-dial-item{
+        height:40px;
+        font-size:15px;
+      }
+      .model-track-panel{
+        width:auto;
+        left:0;
+        right:0;
+        top:auto;
+        bottom:0;
+        height:180px;
+      }
+      .model-viewer-stage.has-track-panel .model-canvas{
+        right:0;
+        bottom:180px;
+      }
+      .model-viewer-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .model-toggle,
+      .model-viewer-close{
+        padding:8px 12px;
+        font-size:11px;
+      }
+      .artifact-reader.has-journal-paper{
+        padding:14px;
+      }
+      .artifact-reader.has-journal-paper .artifact-reader-card{
+        width:calc(100vw - 28px);
+        max-height:calc(100vh - 28px);
+      }
+      .artifact-reader.has-tape-player .artifact-reader-card{
+        padding:18px;
+        overflow:auto;
+        display:block;
+      }
+      .artifact-tape-reader-layout{
+        grid-template-columns:1fr;
+        gap:18px;
+      }
+      .artifact-tape-reader-stage{
+        min-height:420px;
+      }
+      .artifact-tape-reader-image{
+        width:100%;
+        max-height:420px;
+      }
+      .photo-gallery-head{
+        padding:16px 16px 10px;
+      }
+      .photo-gallery-head h4{
+        font-size:18px;
+      }
+      .photo-gallery-stage{
+        min-height:460px;
+        padding:10px 10px 68px;
+      }
+      .photo-slide{
+        width:min(52vw, 300px);
+        height:min(46vh, 340px);
+      }
+      .photo-slide.prev{
+        transform:translate3d(calc(-50% - 150px), -50%, -110px) rotateY(34deg) scale(.76);
+      }
+      .photo-slide.next{
+        transform:translate3d(calc(-50% + 150px), -50%, -110px) rotateY(-34deg) scale(.76);
+      }
+      .photo-slide.prevLeftSecond{
+        transform:translate3d(calc(-50% - 245px), -50%, -220px) rotateY(48deg) scale(.56);
+      }
+      .photo-slide.nextRightSecond{
+        transform:translate3d(calc(-50% + 245px), -50%, -220px) rotateY(-48deg) scale(.56);
+      }
+    }
+    @media (max-width: 520px){
+      .landing{
+        padding:18px 12px;
+      }
+      .landing h1{
+        font-size:clamp(52px, 22vw, 120px);
+      }
+      .sub{
+        font-size:clamp(18px, 6vw, 28px);
+      }
+      .enter-wrap{
+        justify-content:center;
+      }
+      .timeline-nav{
+        top:46px;
+      }
+      .timeline-content{
+        padding:12px;
+      }
+      .timeline-readout{
+        flex-wrap:wrap;
+        justify-content:flex-start;
+      }
+      .timeline-readout em{
+        width:100%;
+      }
+      .timeline-mark span{
+        display:none;
+      }
+      .details h2{
+        font-size:24px;
+      }
+      .detail-list{
+        gap:8px;
+      }
+      .detail-list li{
+        padding:6px 10px;
+      }
+      .artifact-actions{
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .artifact-enter,
+      .artifact-model{
+        width:100%;
+      }
+      .model-status{
+        left:8px;
+        right:8px;
+        bottom:8px;
+        font-size:11px;
+      }
+    }
+    @media (max-height: 760px){
+      .timeline-content{
+        max-height:min(60vh, 360px);
+      }
+      .timeline-marks{
+        height:44px;
+      }
+      .timeline-mark span{
+        font-size:11px;
+      }
+      .model-viewer-card{
+        height:90vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-fade" id="bgFade" aria-hidden="true"></div>
+  <audio id="swooshAudio" preload="auto">
+    <source src="swoosh.mp3" type="audio/mpeg" />
+  </audio>
+
+  <section class="landing" id="landing">
+    <section class="mast">
+      <h1>Dead Silence</h1>
+      <p class="sub">lost artifacts from the city undead.</p>
+    </section>
+    <div class="enter-wrap">
+      <button class="enter-circle" id="enterTimeline" type="button" aria-label="Enter timeline"></button>
+    </div>
+  </section>
+
+  <main class="timeline-app" id="timelineApp" aria-live="polite">
+    <div class="timeline-bg is-visible" id="timelineBg">
+      <div class="timeline-bg-layer is-visible"></div>
+      <div class="timeline-bg-layer"></div>
+    </div>
+    <div class="timeline-overlay">
+      <nav class="timeline-nav" id="timelineNav" aria-label="Recovered Timeline">
+        <div class="timeline-dial">
+          <div class="timeline-readout">
+            <span>Archive Tuner</span>
+            <strong id="dialReadout">January 2042</strong>
+            <em id="dialState">Locked</em>
+          </div>
+          <div class="timeline-line"></div>
+          <div class="timeline-signal" id="timelineSignal"></div>
+          <input class="timeline-range" id="timelineDial" type="range" min="0" max="7" step="0.01" value="0" aria-label="Tune timeline" />
+          <div class="timeline-marks" id="timelineIndex"></div>
+        </div>
+      </nav>
+
+      <header>
+        <h1 class="timeline-header"><span id="timelineCount">01</span> <span id="timelineHeaderTitle">Before The Fall</span></h1>
+      </header>
+
+      <section class="timeline-content">
+        <div class="date-block">
+          <div class="month-dial" aria-hidden="true">
+            <div class="month-stack" id="monthStack"></div>
+          </div>
+          <span class="date-number" id="dateNumber">01</span>
+          <span class="day-name" id="dayName">Quiet</span>
+        </div>
+
+        <div class="details">
+          <div class="details-inner">
+            <div class="eyeline" id="eyeline">Recovered record</div>
+            <h2 id="slideTitle">Before The Fall</h2>
+            <p class="year" id="slideYear">October 3, 2015</p>
+            <p class="desc" id="slideDesc"></p>
+            <ul class="detail-list">
+              <li id="detailTag1"></li>
+              <li id="detailTag2"></li>
+              <li class="notes" id="detailNotes"></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <section class="artifact-view" id="artifactView" aria-live="polite">
+    <div class="artifact-inner">
+      <div class="artifact-top">
+        <div>
+          <p class="artifact-kicker" id="artifactKicker">Artifact Archive</p>
+          <h2 class="artifact-title" id="artifactTitle">Artifacts</h2>
+          <p class="artifact-sub" id="artifactSubtitle"></p>
+        </div>
+        <button class="artifact-close" id="artifactClose" type="button">Return</button>
+      </div>
+      <div class="artifact-browser">
+        <div class="artifact-selector">
+          <div class="artifact-dial-head">
+            <span>Artifact Dial</span>
+            <strong id="artifactDialCount">01</strong>
+          </div>
+          <div class="artifact-dial-window" aria-hidden="true">
+            <div class="artifact-dial-stack" id="artifactDialStack"></div>
+          </div>
+          <div class="artifact-dial-track">
+            <button class="artifact-step-dot" id="artifactStepUp" type="button" aria-label="Previous artifact"></button>
+            <button class="artifact-step-dot" id="artifactStepDown" type="button" aria-label="Next artifact"></button>
+          </div>
+        </div>
+        <div class="artifact-panel">
+          <p class="artifact-meta" id="artifactMeta">Recovered Journal</p>
+          <h3 id="artifactItemTitle">Artifact Entry</h3>
+          <ul class="artifact-facts" id="artifactFacts"></ul>
+          <p id="artifactItemDesc"></p>
+          <div class="artifact-tape-feature" id="artifactTapeFeature" hidden>
+            <img class="artifact-tape-image artifact-tape-state-image" id="artifactTapeImage" src="tape.png" alt="Recovered cassette tape">
+            <button class="artifact-tape-play" id="artifactTapePlay" type="button" aria-label="Play recovered tape">Play Tape</button>
+          </div>
+          <div class="artifact-audio" id="artifactAudioWrap" hidden>
+            <p id="artifactAudioTitle">Object Log Audio</p>
+            <audio id="artifactAudio" controls preload="none"></audio>
+          </div>
+          <div class="artifact-actions">
+            <button class="artifact-enter" id="artifactEnter" type="button">Enter</button>
+            <button class="artifact-model" id="artifactModelOpen" type="button">View 3D Artifact</button>
+          </div>
+          <div class="artifact-playlist" id="artifactPlaylist" hidden>
+            <p>Unlocked Tracks</p>
+            <ul id="artifactPlaylistItems"></ul>
+          </div>
+          <div class="artifact-sublist" id="artifactSublist">
+            <h4 id="artifactSublistTitle">Sublist</h4>
+            <ul id="artifactSubitems"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="artifact-reader" id="artifactReader" aria-modal="true" role="dialog" aria-hidden="true">
+        <div class="artifact-reader-card">
+          <div class="artifact-reader-head">
+            <div>
+              <p id="artifactReaderMeta">Archive Entry</p>
+              <h4 id="artifactReaderTitle">Entry</h4>
+            </div>
+            <button class="artifact-reader-close" id="artifactReaderClose" type="button">Return</button>
+          </div>
+          <div class="artifact-reader-body" id="artifactReaderBody"></div>
+        </div>
+      </div>
+      <div class="photo-gallery" id="photoGallery" aria-modal="true" role="dialog" aria-hidden="true">
+        <div class="photo-gallery-card">
+          <div class="photo-gallery-head">
+            <div>
+              <p id="photoGalleryMeta">Incident Photography</p>
+              <h4 id="photoGalleryTitle">Photo Gallery</h4>
+            </div>
+            <button class="photo-gallery-close" id="photoGalleryClose" type="button">Return</button>
+          </div>
+          <div class="photo-gallery-stage">
+            <div class="photo-carousel" id="photoCarousel"></div>
+            <div class="photo-gallery-controls">
+              <button class="photo-gallery-btn" id="photoGalleryPrev" type="button" aria-label="Previous photo">&#10094;</button>
+              <div class="photo-gallery-count" id="photoGalleryCount">01 / 01</div>
+              <button class="photo-gallery-btn" id="photoGalleryNext" type="button" aria-label="Next photo">&#10095;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="model-viewer" id="modelViewer" aria-modal="true" role="dialog" aria-hidden="true">
+        <div class="model-viewer-card">
+          <div class="model-viewer-head">
+            <div>
+              <p>3D Artifact</p>
+              <h4 id="modelViewerTitle">Interactive Object</h4>
+            </div>
+            <div class="model-viewer-actions">
+              <button class="model-toggle" id="modelToggleOn" type="button" hidden>Turn On</button>
+              <button class="model-viewer-close" id="modelViewerClose" type="button">Return</button>
+            </div>
+          </div>
+          <div class="model-viewer-stage" id="modelViewerStage">
+            <div class="model-canvas" id="modelCanvas"></div>
+            <div class="model-screen-overlay" id="modelScreenOverlay" hidden>
+              <p>Player Queue</p>
+              <ul id="modelScreenList"></ul>
+            </div>
+            <aside class="model-track-panel" id="modelTrackPanel" hidden>
+              <p>Playlist</p>
+              <ul id="modelTrackItems"></ul>
+            </aside>
+            <p class="model-status" id="modelStatus">Loading model...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="./vendor/three.min.js"></script>
+  <script src="./vendor/OrbitControls.js"></script>
+  <script src="./vendor/DRACOLoader.js"></script>
+  <script src="./vendor/GLTFLoader.js"></script>
+  <script>
+    (() => {
+      const slides = [
+        {
+          title: "Life Before The Crisis",
+          header: "Before The Event",
+          month: "Jan",
+          number: "01",
+          position: 0,
+          serialMonth: 0,
+          background: "a.jpeg",
+          accent: "rgba(73, 93, 118, .18)",
+          day: "2042",
+          year: "January 2042",
+          banner: "I. Before The Event",
+          desc: "The world still functions as expected. Institutions hold, supply chains move, and daily life carries on without any accepted sense that collapse is approaching.",
+          tags: ["Normal life", "Civic stability"],
+          notes: "Life before the crisis fully enters public awareness."
+        },
+        {
+          title: "Early Symptoms",
+          header: "Before The Event",
+          month: "Sep",
+          number: "02",
+          position: 14.2857,
+          serialMonth: 20,
+          background: "a.jpeg",
+          accent: "rgba(121, 97, 38, .18)",
+          day: "2043",
+          year: "September 2043",
+          banner: "I. Before The Event",
+          desc: "The first unmistakable abnormalities appear in hospitals, transit hubs, and municipal reporting. Cases remain isolated in the official narrative, but the pattern is beginning to show.",
+          tags: ["Medical anomalies", "Scattered reports"],
+          notes: "The earliest visible signs of systemic danger."
+        },
+        {
+          title: "Public Concern",
+          header: "Before The Event",
+          month: "Feb",
+          number: "03",
+          position: 28.5714,
+          serialMonth: 25,
+          background: "a.jpeg",
+          accent: "rgba(122, 31, 28, .18)",
+          day: "2044",
+          year: "February 2044",
+          banner: "I. Before The Event",
+          desc: "Fear enters public discourse openly. Citizens begin changing routines, monitoring official statements, and preparing in ways governments still avoid endorsing.",
+          tags: ["Public concern", "Rising fear"],
+          notes: "This is where anxiety becomes social behavior."
+        },
+        {
+          title: "Collapse Begins",
+          header: "Event-Time (The Fall)",
+          month: "Apr",
+          number: "04",
+          position: 42.8571,
+          serialMonth: 27,
+          background: "a.jpeg",
+          accent: "rgba(145, 43, 35, .22)",
+          day: "2044",
+          year: "April 2044",
+          banner: "II. Event-Time (The Fall)",
+          desc: "The first major breakdowns spread through dense cities and regional systems. Order stops failing in theory and starts failing in front of everyone at once.",
+          tags: ["System collapse", "Mass disruption"],
+          notes: "The fall becomes visible and irreversible."
+        },
+        {
+          title: "Permanent Disorder",
+          header: "Event-Time (The Fall)",
+          month: "Aug",
+          number: "05",
+          position: 57.1428,
+          serialMonth: 31,
+          background: "a.jpeg",
+          accent: "rgba(94, 54, 19, .24)",
+          day: "2044",
+          year: "August 2044",
+          banner: "II. Event-Time (The Fall)",
+          desc: "Disorder is no longer treated as temporary. Infrastructure failures stop being recoverable events and become the ordinary condition of daily survival.",
+          tags: ["Permanent disorder", "Infrastructure loss"],
+          notes: "Emergency stabilizes into the new normal."
+        },
+        {
+          title: "Survive",
+          header: "Survival Era",
+          month: "Jan",
+          number: "06",
+          position: 71.4285,
+          serialMonth: 36,
+          background: "a.jpeg",
+          accent: "rgba(74, 92, 64, .2)",
+          day: "2045",
+          year: "January 2045",
+          banner: "III. Survival Era",
+          desc: "The central question is no longer whether society can be restored, but who can persist through what remains. Shelter, food, heat, and defense define every decision.",
+          tags: ["Immediate survival", "Defensive living"],
+          notes: "The era of surviving first and planning later."
+        },
+        {
+          title: "Adapt",
+          header: "Survival Era",
+          month: "Jan",
+          number: "07",
+          position: 85.7142,
+          serialMonth: 72,
+          background: "a.jpeg",
+          accent: "rgba(103, 116, 71, .2)",
+          day: "2052",
+          year: "January 2048 - December 2052",
+          banner: "III. Survival Era",
+          desc: "Some enclaves stop moving and start designing for continuity. Food systems, perimeter logic, and trade discipline create the first durable settlement patterns after the fall.",
+          tags: ["Settlement growth", "Local systems"],
+          notes: "Survival becomes structured."
+        },
+        {
+          title: "What Remains",
+          header: "Survival Era",
+          month: "Jan",
+          number: "08",
+          position: 96.57,
+          serialMonth: 132,
+          background: "a.jpeg",
+          accent: "rgba(149, 121, 45, .2)",
+          day: "2058",
+          year: "January 2053 - December 2058",
+          banner: "III. Survival Era",
+          desc: "Societies form. Zombies evolve behaviorally. Radio systems stabilize and fail repeatedly. The living begin defining territory, defending corridors, and competing over controlled routes and salvage zones. Life stablizes but for how long?",
+          tags: ["Territorial order", "Behavioral shift"],
+          notes: "The post-collapse world starts acting like a world again."
+        }
+      ];
+
+      const landing = document.getElementById("landing");
+      const enterButton = document.getElementById("enterTimeline");
+      const bgFade = document.getElementById("bgFade");
+      const swooshAudio = document.getElementById("swooshAudio");
+      const timelineApp = document.getElementById("timelineApp");
+      const timelineIndex = document.getElementById("timelineIndex");
+      const timelineDial = document.getElementById("timelineDial");
+      const dialReadout = document.getElementById("dialReadout");
+      const dialState = document.getElementById("dialState");
+      const timelineSignal = document.getElementById("timelineSignal");
+      const timelineBg = document.getElementById("timelineBg");
+      const timelineBgLayers = timelineBg.querySelectorAll(".timeline-bg-layer");
+
+      const timelineCount = document.getElementById("timelineCount");
+      const timelineHeaderTitle = document.getElementById("timelineHeaderTitle");
+      const monthStack = document.getElementById("monthStack");
+      const dateNumber = document.getElementById("dateNumber");
+      const dayName = document.getElementById("dayName");
+      const eyeline = document.getElementById("eyeline");
+      const slideTitle = document.getElementById("slideTitle");
+      const slideYear = document.getElementById("slideYear");
+      const slideDesc = document.getElementById("slideDesc");
+      const detailTag1 = document.getElementById("detailTag1");
+      const detailTag2 = document.getElementById("detailTag2");
+      const detailNotes = document.getElementById("detailNotes");
+      const artifactView = document.getElementById("artifactView");
+      const artifactKicker = document.getElementById("artifactKicker");
+      const artifactTitle = document.getElementById("artifactTitle");
+      const artifactSubtitle = document.getElementById("artifactSubtitle");
+      const artifactDialCount = document.getElementById("artifactDialCount");
+      const artifactDialStack = document.getElementById("artifactDialStack");
+      const artifactStepUp = document.getElementById("artifactStepUp");
+      const artifactStepDown = document.getElementById("artifactStepDown");
+      const artifactClose = document.getElementById("artifactClose");
+      const artifactMeta = document.getElementById("artifactMeta");
+      const artifactItemTitle = document.getElementById("artifactItemTitle");
+      const artifactFacts = document.getElementById("artifactFacts");
+      const artifactItemDesc = document.getElementById("artifactItemDesc");
+      const artifactTapeFeature = document.getElementById("artifactTapeFeature");
+      const artifactTapeImage = document.getElementById("artifactTapeImage");
+      const artifactTapePlay = document.getElementById("artifactTapePlay");
+      const artifactAudioWrap = document.getElementById("artifactAudioWrap");
+      const artifactAudioTitle = document.getElementById("artifactAudioTitle");
+      const artifactAudio = document.getElementById("artifactAudio");
+      const artifactPlaylist = document.getElementById("artifactPlaylist");
+      const artifactPlaylistItems = document.getElementById("artifactPlaylistItems");
+      const artifactEnter = document.getElementById("artifactEnter");
+      const artifactModelOpen = document.getElementById("artifactModelOpen");
+      const artifactSublist = document.getElementById("artifactSublist");
+      const artifactSublistTitle = document.getElementById("artifactSublistTitle");
+      const artifactSubitems = document.getElementById("artifactSubitems");
+      const artifactReader = document.getElementById("artifactReader");
+      const artifactReaderMeta = document.getElementById("artifactReaderMeta");
+      const artifactReaderTitle = document.getElementById("artifactReaderTitle");
+      const artifactReaderBody = document.getElementById("artifactReaderBody");
+      const artifactReaderClose = document.getElementById("artifactReaderClose");
+      const photoGallery = document.getElementById("photoGallery");
+      const photoGalleryMeta = document.getElementById("photoGalleryMeta");
+      const photoGalleryTitle = document.getElementById("photoGalleryTitle");
+      const photoCarousel = document.getElementById("photoCarousel");
+      const photoGalleryCount = document.getElementById("photoGalleryCount");
+      const photoGalleryPrev = document.getElementById("photoGalleryPrev");
+      const photoGalleryNext = document.getElementById("photoGalleryNext");
+      const photoGalleryClose = document.getElementById("photoGalleryClose");
+      const modelViewer = document.getElementById("modelViewer");
+      const modelViewerTitle = document.getElementById("modelViewerTitle");
+      const modelToggleOn = document.getElementById("modelToggleOn");
+      const modelViewerClose = document.getElementById("modelViewerClose");
+      const modelViewerStage = document.getElementById("modelViewerStage");
+      const modelCanvas = document.getElementById("modelCanvas");
+      const modelScreenOverlay = document.getElementById("modelScreenOverlay");
+      const modelScreenList = document.getElementById("modelScreenList");
+      const modelTrackPanel = document.getElementById("modelTrackPanel");
+      const modelTrackItems = document.getElementById("modelTrackItems");
+      const modelStatus = document.getElementById("modelStatus");
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+      let index = 0;
+      let dialPercent = slides[0].position;
+      let activeBackgroundLayer = 0;
+      let activeArtifactItemIndex = 0;
+      let activeArtifactItems = [];
+      const imageCache = new Map();
+      let modelScene = null;
+      let modelCamera = null;
+      let modelRenderer = null;
+      let modelControls = null;
+      let loadedModel = null;
+      let modelAnimationId = 0;
+      let modelLoader = null;
+      let activeModelArtifact = null;
+      let currentModelPath = "";
+      let cinematicAnimationId = 0;
+      let modelLocked = false;
+      let lastFitDistance = 3.5;
+      let activeScreenTrackIndex = -1;
+      let activePhotoGalleryItems = [];
+      let activePhotoGalleryIndex = 0;
+      let activeTapeArtifactTitle = "";
+      const poweredArtifacts = new Set();
+      const tapeButtonSound = new Audio("tape recorder play stop sound.mp3");
+      const placeholderTracks = [
+        { title: "Placeholder Track 01", file: "pre-crisis.mp3" },
+        { title: "Placeholder Track 02", file: "pre-crisis.mp3" },
+        { title: "Placeholder Track 03", file: "pre-crisis.mp3" }
+      ];
+
+      function getMonthMetrics() {
+        return window.matchMedia("(max-width: 760px)").matches
+          ? { step: 22, center: 22 }
+          : { step: 30, center: 31 };
+      }
+
+      function buildMonthDial() {
+        const totalMonths = slides[slides.length - 1].serialMonth + 5;
+
+        for (let i = 0; i <= totalMonths; i += 1) {
+          const item = document.createElement("div");
+          item.className = "month-item";
+          item.textContent = monthNames[i % 12];
+          monthStack.appendChild(item);
+        }
+      }
+
+      function getNearestSlideIndex(percent) {
+        let nearestIndex = 0;
+        let nearestDistance = Infinity;
+
+        slides.forEach((slide, slideIndex) => {
+          const distance = Math.abs(percent - slide.position);
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestIndex = slideIndex;
+          }
+        });
+
+        return nearestIndex;
+      }
+
+      function getActiveSlideIndex(percent) {
+        let activeIndex = 0;
+
+        slides.forEach((slide, slideIndex) => {
+          if (percent >= slide.position) {
+            activeIndex = slideIndex;
+          }
+        });
+
+        return activeIndex;
+      }
+
+      function formatDialReadout(percent) {
+        const lowerIndex = getActiveSlideIndex(percent);
+        const lowerSlide = slides[lowerIndex];
+        const upperSlide = slides[Math.min(slides.length - 1, lowerIndex + 1)];
+
+        if (lowerIndex === slides.length - 1 || percent < upperSlide.position - 0.2) {
+          return lowerSlide.year;
+        }
+
+        return `${lowerSlide.year} -> ${upperSlide.year}`;
+      }
+
+      function getInterpolatedSerialMonth(percent) {
+        const currentIndex = getActiveSlideIndex(percent);
+        const currentSlide = slides[currentIndex];
+        const nextSlide = slides[Math.min(slides.length - 1, currentIndex + 1)];
+
+        if (currentIndex === slides.length - 1 || percent <= currentSlide.position) {
+          return currentSlide.serialMonth;
+        }
+
+        const range = nextSlide.position - currentSlide.position || 1;
+        const ratio = Math.max(0, Math.min(1, (percent - currentSlide.position) / range));
+        return currentSlide.serialMonth + (nextSlide.serialMonth - currentSlide.serialMonth) * ratio;
+      }
+
+      function updateMonthDial(serialMonth) {
+        const metrics = getMonthMetrics();
+        const offset = metrics.center - serialMonth * metrics.step;
+        monthStack.style.transform = `translateY(${offset}px)`;
+      }
+
+      function updateSignal(percent) {
+        timelineSignal.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+        dialReadout.textContent = formatDialReadout(percent);
+        updateMonthDial(getInterpolatedSerialMonth(percent));
+      }
+
+      function buildIndex() {
+        slides.forEach((slide, slideIndex) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "timeline-mark";
+          button.dataset.index = String(slideIndex);
+          button.style.left = `${slide.position}%`;
+          button.innerHTML = `<strong>${slide.month}</strong><span>${slide.title}</span>`;
+          button.addEventListener("click", () => {
+            index = slideIndex;
+            renderSlide();
+            openArtifactView(slide);
+          });
+          timelineIndex.appendChild(button);
+        });
+      }
+
+      function loadBackgroundSource(src) {
+        if (imageCache.has(src)) {
+          return imageCache.get(src);
+        }
+
+        const promise = new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(src);
+          img.onerror = () => resolve("a.jpeg");
+          img.src = src;
+        });
+
+        imageCache.set(src, promise);
+        return promise;
+      }
+
+      async function updateTimelineBackground(slide) {
+        const nextLayerIndex = activeBackgroundLayer === 0 ? 1 : 0;
+        const nextLayer = timelineBgLayers[nextLayerIndex];
+        const currentLayer = timelineBgLayers[activeBackgroundLayer];
+        const source = await loadBackgroundSource(slide.background || "a.jpeg");
+
+        nextLayer.style.setProperty("--bg-image", `url("${source}")`);
+        nextLayer.style.setProperty("--bg-accent", slide.accent || "rgba(122, 31, 28, .12)");
+        nextLayer.classList.add("is-visible");
+        currentLayer.classList.remove("is-visible");
+        activeBackgroundLayer = nextLayerIndex;
+      }
+
+      function getArtifactsForSlide(slide) {
+        if (slide.title === "Survive") {
+          return [
+            {
+              title: "Messer Officer Field Journal",
+              meta: "Recovered Journal",
+              model: "messer.glb",
+              desc: "A first-person patrol record from a storm night inside an abandoned facility, documenting routine checks, transient occupation, and a controlled removal of unknowns from the perimeter.",
+              facts: {
+                type: "Survivor Field Log",
+                temporalAnchor: "During Event (Year X, Storm Night)",
+                location: "Messer Complex - 5th Floor Sector",
+                condition: "Water-stained paper / partial ink run",
+                reliability: "Limited perspective"
+              },
+              sublistLabel: "Messer Complex Entries",
+              subitems: [
+                {
+                  title: "Night Log - Rain Patrol",
+                  desc: `It was raining when I set out tonight. I decided to take the night shift and move into one of the more desolate regions of the city, hoping the cover of darkness would keep unwanted attention away.
+
+Keeping my gear dry turned into its own problem. My pack has a hole forming near the bottom seam, slowly widening with every trip. Just another piece of everyday wear and tear in this world.
+
+I arrived at the destination without much trouble. The place can sometimes be safe, but it’s always good practice to run routine parameter checks before settling in. Complacency gets people killed.
+
+There were signs someone had been here recently. Looters most likely. Whoever it was had stripped anything they thought might have value-even light fixtures and other odd bits of hardware. One of the trash receptacles had been dragged out of its usual position and was being used as a container for scavenged materials.
+
+The weather might have pushed someone inside. When the rain and cold hit like this, people start looking for shelter wherever they can find it.
+
+I know this facility well, so I started checking the usual spots-places people tend to gravitate toward because they’re dry, quiet, and defensible.
+
+The first location, a resting spot near the fifth floor, was empty. Still, the signs of recent occupation were obvious: scattered debris, loose materials across the floor, and the kind of disarray that tells you someone packed up quickly.
+
+I continued the parameter check, mostly for peace of mind. I had no intention of sharing the space tonight with hostiles-or worse, the undead finding their way inside the complex.
+
+The second location showed nothing but thin drops of slime falling from the ceiling. Outside, lightning rumbled across the sky, the thunder shaking through the concrete corridors of the stairwell.
+
+I moved on.
+
+At the third location I found two wanderers from the region camped inside a narrow corridor. They had already noticed me peering through the small observation window in the heavy security door, so I made my presence known immediately.
+
+When I stepped inside, I asked what business they had being inside the facility.
+
+They explained they were only looking for shelter from the storm and planned to stay just long enough for the weather to pass. Fortunately, they were friendlies-faces I had seen before at an encampment north of here. One of them even recognized me, and we exchanged a bit of small talk about where they’d been and how things were holding up outside.
+
+Still, tonight wasn’t the night to take chances.
+
+I told them an envoy was expected to arrive soon, and that unknowns wouldn’t be tolerated inside the perimeter. They understood.
+
+I gave them directions to another encampment nearby and told them if they mentioned my codename they’d be allowed to stay there for the night.
+
+They gathered their things and moved out quickly.
+
+Storm’s still rolling overhead.
+
+The facility is quiet again-for now.`
+                },
+                {
+                  title: "Night Log - Stairwell Sweep",
+                  desc: `Rain pushed movement into the lower stairwell tonight. I ran the same route twice and found signs of fresh passage, mostly footprints and shifted debris near the service landing.
+
+No active hostiles, but the sound profile carried farther than expected. I marked the southern stair exit as high risk until weather clears.
+
+Two doors on level four are jammed again. If we need a fast fallback route, do not count on that corridor.
+
+Perimeter held. No breach.`
+                },
+                {
+                  title: "Night Log - When It Rains",
+                  desc: `Rain yet again. Except more thunder and lightning. Can't ever catch a break with this weather. It's either freezing, raining, or somewhere in between.
+
+Being on 8-hour parameter patrols in below-zero temperatures puts a lot into perspective. A tornado will also do the same.
+
+Some might think I'm crazy for saying this, but this is what it means to be close to God. For me, it's not singing and dancing near the pulpit. It's lightning strikes during thunderstorms while trekking near a surging river. That's spirituality at its most enduring.
+
+When I woke up today, I had received a note from Captain M., the lead administrator at the abandoned facility. He explained that another officer and myself had failed to properly report on our observations from the night before. That even though our camera systems have been down for weeks, it doesn't excuse us from performing our duties near the perimeter.
+
+Looters have been entering the facility and stealing anything that isn't nailed down, and even things that are. This incident doesn't look favorably on our team, and will be reported up the chain to higher commanders.
+
+When it rains, it pours. I can't ever catch a break.`
+                },
+                {
+                  title: "Night Log - A Rude Awakening",
+                  desc: `Heavy movement from the chasers this morning on the southwest side of the city. Arrival was easy enough. I kept to low visibility through the night and was mostly successful.
+
+Gunshots rang out not far from the outpost early this morning. The noise pulled a small group toward the corner of Moses and Washington Avenue. Once those chasers lock on, it's bad news. They move slow, but they stay on target until a bullet stops them. Sometimes they pursue for miles.
+
+There were already too many to pick off. It wasn't advised anyway, since rifle fire would only draw more attention. The only alternative was to gather whatever provisions I could carry and get out fast.
+
+I had a close call in a security hall. One of those dead bastards got a decrepit claw onto my shoulder as I passed through. I can still smell the rank odor of death it carried. That's one thing I won't forget. When they're around, you notice the rot in the air.
+
+I shoved it off, but it came in again. Before it could put its teeth in my throat, I hit the wall security switch. The metal door came down immediately and crushed it into sludge. The remains twitched for a few seconds, then deanimated.
+
+I grabbed my gear and moved out to safer ground. I crossed the College Street bridge toward the university on the south side. There's a friendly camp over there. They let me trade a few supplies and hold up until conditions cleared that night.
+
+I stayed on watch around the perimeter for a few hours to repay the favor for bringing me in on short notice.`
+                },
+                {
+                  title: "Night Log - Dream Shock",
+                  desc: `I woke up and jumped directly onto my feet, flying into a burst of action. My heart was pounding, my body sweating, my whole system in panic. I had that dream again. That one where... well... I don't want to talk about it.
+
+I don't remember all the details. I only remember staring through a dirty glass door window that overlooked a concrete deck. Near the entrance was a set of wet footprints.
+
+Realizing that in the dream washed waves of uneasiness over me and filled my whole body with the impulse to flee as fast as I could.
+
+But when I turned around, I was face-to-face with a deadstalker staring back at me. Its glowing eyes and venomous fangs were so close I could feel its cannibal breath brushing my face.
+
+As I peered into that fiendish ghoul, I couldn't help feeling I had seen it before. That I had known this person, or at least felt their darkness, their presence. I've seen it in another dream, sitting in the background, watching me. Waiting.
+
+Once my body was ready to settle again, I laid back down with my gear. I went back to sleep, quietly reminding myself it was just a dream.`
+                },
+                {
+                  title: "Night Log - Generator Flood",
+                  desc: `Halfway into the night, we had a power outage. Little did any of the officers know, but a busted pipe led to the electrical room being flooded.
+
+The water reached the generator and fried multiple circuits. Replacing the wiring may take some time, since these resources are few and far between.
+
+We will have to work with what we have until then.`
+                },
+                {
+                  title: "Night Log - Systems Not Recovering",
+                  desc: `We were able to replace the failed parts on the generator. Once we had the system operational again, we started noticing power issues all over the building.
+
+Along with those issues, the surveillance cameras across every building went completely black, and we have been unable to bring them back into operation.`
+                },
+                {
+                  title: "Night Watch Log",
+                  desc: `22:00
+Took over perimeter watch on the east side of the university fence. Wind picking up from the river. Visibility decent under the moonlight. Two wanderers spotted across the parking lot near the collapsed bus stop. No movement toward the fence.
+
+23:00
+Heard distant gunshots somewhere north of the bridge. Hard to tell how far. Camp lights dimmed shortly after to avoid drawing attention. Wanderers have drifted farther down the street.
+
+24:00
+Street mostly quiet now. One figure moving slowly near the old pharmacy building. Hard to tell what type from this distance. Doesn't appear to be pursuing anything.
+
+01:00
+Wind died down. Sound carries farther now. Heard something strange in the distance, almost like a scream, but distorted. Didn't repeat. Kept watch for movement after that.
+
+02:00
+Group of four wanderers passed through the intersection two blocks south. They moved together but didn't appear to be chasing anything. Possibly drifting with the wind or following noise from earlier.
+
+03:00
+Noticed something unusual near the stadium road. One infected walking ahead of the others with the rest trailing behind at a distance. Could be coincidence, but it looked deliberate.
+
+Making a note of it.
+
+04:00
+Heavy fog rolling in from the river. Visibility dropping fast. Sounds harder to track. Camp still quiet.
+
+05:00
+First signs of morning light. Most movement has slowed down. Wanderers dispersing. Nothing approaching the fence line.
+
+06:00
+Watch ended. No breach overnight. Handed position over to the next shift.
+
+Going to try to get some sleep.`
+                },
+                {
+                  title: "Night Watch Log - South Perimeter Entry",
+                  desc: `22:00
+Started watch on the south perimeter near the train tracks. Camp quiet. Generator still down, cameras not working. One wanderer spotted near the broken scoreboard. Just pacing back and forth.
+
+23:00
+Wind carrying the smell of rot from the western streets tonight. Means there's movement somewhere out there. Haven't seen anything close to the fence yet.
+
+24:00
+Heard shuffling near the old parking structure. Three wanderers drifting through the lot. One of them kept stopping and looking around like it was confused.
+
+01:00
+Something banged against a metal sign down the street. Loud enough to make a few of them turn toward the sound. No screamers though. Lucky break.
+
+02:00
+Movement picked up along the north road. At least six infected passing through the intersection. They stayed in a loose group but didn't approach the fence. One of them walking slightly ahead of the others again.
+
+I'm starting to think that isn't random.
+
+03:00
+Fog settling in around the stadium area off to the southwest. Hard to see past the outer lights now. Thought I saw something standing near the stadium lights for a few seconds, but it was gone when I checked again.
+
+Probably nothing.
+
+Still made the hair on my neck stand up.
+
+04:00
+Everything went dead quiet for about fifteen minutes. No movement anywhere. That kind of silence usually means something bigger is moving through the area.
+
+Stayed on high alert.
+
+05:00
+Two chasers appeared at the far end of the road but kept moving east. They looked agitated, like they were following something that passed earlier.
+
+Glad it wasn't us.
+
+06:00
+Sun starting to come up. Wanderers drifting off toward the river again. Camp waking up slowly.
+
+Night ended without incident.
+
+Still can't shake the feeling something was out there watching.`
+                },
+                {
+                  title: "Night Watch Log - Facility Incident Report",
+                  desc: `22:00
+3rd shift officers Lucas Ward and Miguel Ramirez reported for duty.
+
+Preliminary route inspection indicated signs of recent physical presence inside the facility. Upon further observation, officers detected three wanderers on the 5th level of the structure.
+
+Subjects appeared non-hostile and were likely seeking temporary refuge from roaming hordes currently active throughout the city. Officers maintained observation until the individuals voluntarily exited the facility.
+
+The wanderers left behind several personal items near their resting location, including gear and heavy coats. These items will be placed in the storage room for temporary holding. If unclaimed after several days, the items will be absorbed into the facility property cache.
+
+23:00
+Armory secure. No irregularities observed.
+
+Nothing further to report.
+
+24:00
+Multiple sleepers observed along the southwest perimeter near the train trestles. Sleepers are typically inactive but remain a potential threat if approached without caution.
+
+Several objects were discovered scattered near the lower levels of the facility. A trash container filled with rock salt appears to have been thrown against an exterior door on the ground level. The condition of the container and the damage to the door suggest it was thrown deliberately and with force.
+
+Incident documented.
+
+01:00
+Helicopters observed circling above the city.
+
+No ground movement detected in the immediate area. However, the abandoned City Centre Tower, located several streets west of the facility, is displaying unusual activity.
+
+Lights are visible on multiple upper levels of the tower.
+
+This is noteworthy as those lights have not been observed active during any prior patrol assignments.
+
+Observation logged for continued monitoring.
+
+02:00
+Full patrol conducted through all five levels of the Messer Facility.
+
+Interior conditions quiet and secure.
+
+No unauthorized movement detected.
+
+Findings: none.
+
+03:00
+Shift check-in conducted with Commander Shaw.
+
+No significant infected movement reported by surrounding patrols.
+
+Camp interior remains quiet. Most residents currently asleep.
+
+04:00
+Rainfall began shortly after 04:00.
+
+Exterior patrol conducted around the facility perimeter. Evidence suggests a breaker box near the main entrance may have been tampered with.
+
+The issue was documented and the breaker box was secured to prevent further interference.
+
+Maintenance inspection recommended during daylight hours.
+
+05:00
+Sleepers previously observed along the southwest rail area have begun showing minor movement.
+
+Additional activity reported along the north and northwest sections of the property near the main intersection.
+
+Movement remains outside the immediate facility perimeter.
+
+06:00
+Shift handoff completed.
+
+Officer Kevin Turner assumed morning perimeter watch.
+
+No breach events recorded during the shift.
+
+End of report.`
+                },
+                {
+                  title: "Incident Report - Stairwell C Sleeper",
+                  desc: `10:36 - Stairwell C / Level 1
+
+While conducting patrol, Officer Lucas Ward discovered an infected sleeper.
+
+Location: Stairwell C landing between the 1st and 2nd levels.
+
+The infected individual was positioned against the wall, head down, body slack. No movement was observed initially.
+
+Ward reports the infected appeared to be in a dormant, or "sleeper," state, consistent with previously documented cases in which infected remain inactive until disturbed by proximity or noise.
+
+Subject details:
+
+Adult male.
+
+Clothing heavily degraded.
+
+Extensive tissue damage consistent with long-term infection.
+
+No immediate aggressive response.
+
+Ward maintained distance and observed the subject for approximately thirty seconds.
+
+The infected remained motionless.
+
+Facility protocol was followed.
+
+The subject was neutralized without incident.
+
+Stairwell cleared and secured.`,
+                  images: [
+                    { src: "Post-Apocalypse Polaroid Photo 9 (1).png", alt: "Dormant infected sleeper discovered on the Stairwell C landing.", caption: "Stairwell C Sleeper - 10:36" }
+                  ]
+                },
+                {
+                  title: "Night Log - Duty and Humanity",
+                  desc: `They tell me it's simple: my duty is to eliminate threats. But I can't shake the fact these threats were once human.
+
+Do I still think about their ultimate humanity? Their freedom? Their wishes and desires?
+
+It's hard to consider that this thing once had a life. Maybe they were a father, or a mother, or someone's child. It's hard to imagine they were once capable of love or dignity when their cold dead eyes are staring into the void while they reach in for a bite at my throat.
+
+I pulled the trigger today, to eliminate the threat as our duty requires. Our cause is survival, but what if our cause blinds us to the larger picture?
+
+I walk this line - where duty demands I pull the trigger, but my ethics still scratch from below the surface to ask: is there still a person behind that vacant gaze?
+
+I asked myself: am I pulling it at a monster, or at what's left of a person? If I lose that question, if I lose that humanity, who's left, even if I survive?
+
+To lose grasp of this means nothing has survived in this world.
+
+It means that we are all already lost.`
+                },
+                {
+                  title: "Night Watch Log - Solo Shift Incident Report",
+                  desc: `22:00
+3rd shift officer Lucas Ward on-site. Received a relay call from Command explaining that Officer Ramirez will not be reporting for duty. He has taken suddenly ill. This always places the crew on alert considering he may be infected. We can only hope for his swift and speedy recovery.
+
+23:00
+Night arrivals. A small caravan of emissaries from Sector 10 are resting here tonight but will be leaving tomorrow morning. We monitored their entry, checked their inventory, and performed the regular infected protocols for any overnight personnel. All is clear. We will remain vigilant along the perimeter tonight.
+
+24:00
+One of the security gates was left unsecured on the north side of the facility. The gate malfunctioned and stayed in the OPEN position. This malfunction most likely occurred when the emissaries entered the facility. Fortunately it was caught and manually secured by officers near the post.
+
+01:00
+While on Level 2, heard sounds coming from the ground level below. It sounded like grunting or incoherent mumbling. Approached the area with caution but found nothing below. Sometimes being isolated out in the night can play tricks on the mind-hearing sounds when it's only the wind howling through hallways and corridors.
+
+02:00
+Full patrol conducted through all five levels of the Messer Facility.
+Interior conditions quiet and secure.
+No unauthorized movement detected.
+
+Findings: None.
+
+Officer Daniels began her shift early to assist with night duties due to Ramirez's absence.
+
+03:00
+Shift check-in conducted with Commander Shaw. Informed him of the gate issue and Officer Daniels' early arrival. Nothing further to report at this time.
+
+04:00
+Detected activity near ground level. A walker moving back and forth near the intersection of Main and Washington Ave. So far it is not interfering with the facility, but we will monitor the situation closely and report any changes.
+
+05:00
+A band of wanderers requested admittance to the property. It was obvious to the officers on staff that the group's leader showed classic symptoms of early bite infection. Skin pale, eyes vacant, profuse sweating. They also presented with a large bite wound on their left arm, partially concealed beneath heavy bandages and layered clothing.
+
+For safety reasons we denied entry and turned the group away.
+
+06:00
+Shift handoff completed.
+
+Officer Kevin Turner reported for 1st shift and responsibilities were transferred.
+
+End of Report`
+                },
+                {
+                  title: "Night Log - The Ball",
+                  desc: `I noticed the ball at 22:02.
+
+It was sitting in the middle of Stairwell C at the Messer Facility.
+
+A small orange rubber ball. The kind you could bounce in one hand.
+
+I stopped halfway down the staircase and looked up.
+
+Empty.
+
+Looked down.
+
+Empty.
+
+The facility was quiet except for the low hum of backup generators somewhere deep in the structure.
+
+I picked up the ball and weighed it in my hand.
+
+"Where the hell did you come from?"
+
+No markings. No labels. No numbers.
+
+Just a cheap rubber ball.
+
+I dropped it on the floor beside the stair railing and kept moving.
+
+Strangely enough, at 23:18, I found it again.
+
+This time it was in Corridor B-12 outside a locked maintenance door.
+
+I stared at it for a moment, perplexed by the sight.
+
+Same ball.
+
+Same scuff mark near the seam.
+
+I glanced down the hallway. Checked it thoroughly.
+
+No one there.
+
+I nudged it with my boot.
+
+It rolled slowly until it tapped the wall.
+
+At 02:47, I passed through the secondary generator hallway.
+
+And stopped again.
+
+The ball was sitting exactly in the center of the corridor.
+
+I couldn't believe it. Was I going mad from all the isolation out here on patrol by myself?
+
+I checked the hallway behind me twice before turning the corner.
+
+At 04:05, I opened the door to Stairwell A.
+
+The ball was on the landing.
+
+Just sitting there.
+
+Perfectly still.
+
+It was too much of a coincidence to be a fluke at this point. I called my Shift Officer and asked him what kind of trick he was playing on me. He asked what the hell I was talking about.
+
+He didn't have a clue.
+
+If it wasn't him, then who?
+
+After that last incident, I only saw it one more time.
+
+When I was returning to my quarters in the Officers' Lodge.
+
+When I opened the door to my room, it slowly rolled out and came to a complete stop at my boot.`,
+                  images: [
+                    { src: "ball1.png", alt: "Orange rubber ball documented in Stairwell C.", caption: "Stairwell C - 22:02" },
+                    { src: "ball2.png", alt: "Orange rubber ball outside the locked maintenance door in Corridor B-12.", caption: "Corridor B-12 - 23:18" },
+                    { src: "balls3.png", alt: "Orange rubber ball positioned in the generator hallway.", caption: "Generator Hallway - 02:47" },
+                    { src: "ball4.png", alt: "Orange rubber ball on the landing near Stairwell A.", caption: "Stairwell A / Officers' Lodge" }
+                  ]
+                },
+                {
+                  title: "Night Log - Transit Hall Hold",
+                  desc: `Power flickered across the transit hall grid and left half the corridor in blackout. I stayed posted near the maintenance choke point for one hour to watch for movement.
+
+One friendly pair crossed through looking for dry shelter. I redirected them toward the north encampment with code clearance.
+
+Undead noise stayed outside the east wall. No interior contact tonight, but the storm is driving traffic toward the complex again.`
+                }
+              ]
+            },
+            {
+              title: "Recovered Tape Track",
+              meta: "Playable Audio Track",
+              desc: "A cassette recovered with the survival records. The sleeve image is gone, but the magnetic strip still holds a short playable signal.",
+              tapeFeature: {
+                audio: "zombie.mp3",
+                audioTitle: "Recovered Tape Track",
+                defaultImage: "tape.png",
+                activeImage: "playtape.png"
+              },
+              facts: {
+                type: "Cassette Audio Track",
+                temporalAnchor: "January 2045",
+                location: "Messer Complex / Storage Cache",
+                condition: "Scuffed casing / playable segment",
+                reliability: "Recovered object audio"
+              },
+              sublistLabel: "Tape Notes",
+              subitems: [
+                { title: "Track Label", desc: "No handwritten title survived on the cassette shell." },
+                { title: "Playback Note", desc: "The signal remains playable, though the original recording context is incomplete." },
+                { title: "Storage Mark", desc: "Recovered from the same cache as survival-era field materials." }
+              ]
+            },
+            {
+              title: "Survive Broadcast",
+              meta: "Audio Fragment",
+              desc: `A clipped transmission replaying the mood of ${slide.header.toLowerCase()}, preserved with static and partial timestamps.`,
+              facts: {
+                type: "Emergency Broadcast Fragment",
+                temporalAnchor: `${slide.year}`,
+                location: "Relay Band / Unknown Tower Origin",
+                condition: "Signal degraded / timestamp incomplete",
+                reliability: "Partial transmission"
+              },
+              subitems: [
+                { title: "Signal Burst", desc: "Short intelligible section isolated from the original noise floor." },
+                { title: "Call Sign", desc: "Probable source identification from the surviving frequency notes." },
+                { title: "Listener Comment", desc: "A later written reaction attached to the audio transcript." }
+              ]
+            },
+            {
+              title: "Survive Notice",
+              meta: "Public Relic",
+              desc: `A posted notice referencing ${slide.tags[1].toLowerCase()} and the routines people tried to follow while conditions kept shifting.`,
+              facts: {
+                type: "Posted Civil Notice",
+                temporalAnchor: `${slide.year}`,
+                location: "Public Corridor / District Wall",
+                condition: "Folded print / edge damage",
+                reliability: "Official but context-limited"
+              },
+              subitems: [
+                { title: "Posted Copy", desc: "The surviving version of the notice as it appeared in the field." },
+                { title: "Revision Mark", desc: "Evidence that the notice was updated after conditions worsened." },
+                { title: "Location Stamp", desc: "A faint district stamp suggesting where it originally hung." }
+              ]
+            },
+            {
+              title: "Survive Inventory",
+              meta: "Archive Sheet",
+              desc: `A catalog fragment assembled later from survivors, mapping what remained identifiable from this chapter of the timeline.`,
+              facts: {
+                type: "Archive Inventory Sheet",
+                temporalAnchor: `Compiled after ${slide.year}`,
+                location: "Recovered Storage Record",
+                condition: "Incomplete ledger / cross-referenced",
+                reliability: "Curated reconstruction"
+              },
+              subitems: [
+                { title: "Catalog Entry", desc: "Primary archive row for the recovered object group." },
+                { title: "Condition Note", desc: "Damage, incompleteness, and preservation observations." },
+                { title: "Cross Reference", desc: "Related entries tied to the same district or survivor cluster." }
+              ]
+            }
+          ];
+        }
+
+        return [
+          {
+            title: `${slide.title} Field Log`,
+            meta: "Recovered Journal",
+            desc: `A handwritten entry tied to ${slide.year}, documenting ${slide.tags[0].toLowerCase()} as the period changed shape.`,
+            model: slide.title === "Life Before The Crisis" ? "https://media.githubusercontent.com/media/gorillaheartmedia/dead-silence/main/mp3playeroff.glb" : null,
+            modelOn: slide.title === "Life Before The Crisis" ? "https://media.githubusercontent.com/media/gorillaheartmedia/dead-silence/main/mp3playeron.glb" : null,
+            modelMaxDim: slide.title === "Life Before The Crisis" ? 1.6 : null,
+            powerOnPose: slide.title === "Life Before The Crisis"
+                ? {
+                  instantLock: true,
+                  x: 0.000, y: 0.000, z: 0.000,
+                  modelPos: { x: 0.000, y: -0.012, z: -0.001 },
+                  cameraPos: { x: -0.020, y: 2.346, z: -0.602 },
+                  target: { x: -0.091, y: 0.003, z: -0.602 },
+                  screenRect: {
+                    center: { x: -0.091, y: 0.003, z: -0.602 },
+                    widthWorld: 0.23,
+                    heightWorld: 0.16
+                  }
+                }
+              : null,
+            audio: slide.title === "Life Before The Crisis" ? "pre-crisis.mp3" : null,
+            audioTitle: slide.title === "Life Before The Crisis" ? "Pre-Crisis Object Log Audio" : null,
+            facts: {
+              type: "Survivor Field Log",
+              temporalAnchor: `During ${slide.header} (${slide.year})`,
+              location: "Abandoned Facility - 5th Floor Sector",
+              condition: "Water-stained paper / partial ink run",
+              reliability: "Limited perspective"
+            },
+            subitems: [
+              { title: "Page 01", desc: "Opening notation on conditions, names, and location markers." },
+              { title: "Page 02", desc: "Mid-entry account of the event pressure shaping the period." },
+              { title: "Margin Notes", desc: "Loose annotations added later by another reader or survivor." }
+            ]
+          },
+          {
+            title: `${slide.title} Broadcast`,
+            meta: "Audio Fragment",
+            desc: `A clipped transmission replaying the mood of ${slide.header.toLowerCase()}, preserved with static and partial timestamps.`,
+            facts: {
+              type: "Emergency Broadcast Fragment",
+              temporalAnchor: `${slide.year}`,
+              location: "Relay Band / Unknown Tower Origin",
+              condition: "Signal degraded / timestamp incomplete",
+              reliability: "Partial transmission"
+            },
+            subitems: [
+              { title: "Signal Burst", desc: "Short intelligible section isolated from the original noise floor." },
+              { title: "Call Sign", desc: "Probable source identification from the surviving frequency notes." },
+              { title: "Listener Comment", desc: "A later written reaction attached to the audio transcript." }
+            ]
+          },
+          {
+            title: `${slide.title} Notice`,
+            meta: "Public Relic",
+            desc: `A posted notice referencing ${slide.tags[1].toLowerCase()} and the routines people tried to follow while conditions kept shifting.`,
+            facts: {
+              type: "Posted Civil Notice",
+              temporalAnchor: `${slide.year}`,
+              location: "Public Corridor / District Wall",
+              condition: "Folded print / edge damage",
+              reliability: "Official but context-limited"
+            },
+            subitems: [
+              { title: "Posted Copy", desc: "The surviving version of the notice as it appeared in the field." },
+              { title: "Revision Mark", desc: "Evidence that the notice was updated after conditions worsened." },
+              { title: "Location Stamp", desc: "A faint district stamp suggesting where it originally hung." }
+            ]
+          },
+          {
+            title: `${slide.title} Inventory`,
+            meta: "Archive Sheet",
+            desc: `A catalog fragment assembled later from survivors, mapping what remained identifiable from this chapter of the timeline.`,
+            facts: {
+              type: "Archive Inventory Sheet",
+              temporalAnchor: `Compiled after ${slide.year}`,
+              location: "Recovered Storage Record",
+              condition: "Incomplete ledger / cross-referenced",
+              reliability: "Curated reconstruction"
+            },
+            subitems: [
+              { title: "Catalog Entry", desc: "Primary archive row for the recovered object group." },
+              { title: "Condition Note", desc: "Damage, incompleteness, and preservation observations." },
+              { title: "Cross Reference", desc: "Related entries tied to the same district or survivor cluster." }
+            ]
+          }
+        ];
+      }
+
+      function renderArtifactDetail() {
+        const artifact = activeArtifactItems[activeArtifactItemIndex];
+        if (!artifact) return;
+
+        artifactMeta.textContent = artifact.meta;
+        artifactItemTitle.textContent = artifact.title;
+        artifactFacts.innerHTML = `
+          <li><strong>Artifact Type:</strong> ${artifact.facts.type}</li>
+          <li><strong>Temporal Anchor:</strong> ${artifact.facts.temporalAnchor}</li>
+          <li><strong>Location:</strong> ${artifact.facts.location}</li>
+          <li><strong>Condition:</strong> ${artifact.facts.condition}</li>
+          <li><strong>Reliability:</strong> ${artifact.facts.reliability}</li>
+        `;
+        artifactItemDesc.textContent = artifact.desc;
+        renderTapeFeature(artifact);
+        if (artifact.audio) {
+          artifactAudioWrap.hidden = false;
+          artifactAudioTitle.textContent = artifact.audioTitle || "Object Log Audio";
+          if (artifactAudio.getAttribute("src") !== artifact.audio) {
+            artifactAudio.src = artifact.audio;
+            artifactAudio.load();
+          }
+        } else if (!artifact.tapeFeature) {
+          artifactAudio.pause();
+          artifactAudio.removeAttribute("src");
+          artifactAudio.load();
+          artifactAudioWrap.hidden = true;
+          artifactAudioTitle.textContent = "";
+        }
+        renderUnlockedPlaylist(artifact);
+        artifactSubitems.innerHTML = "";
+        artifactSublistTitle.textContent = artifact.sublistLabel || "Sublist";
+
+        for (const subitem of artifact.subitems || []) {
+          const item = document.createElement("li");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "artifact-subbutton";
+          button.innerHTML = `<strong>${subitem.title}</strong>`;
+          button.addEventListener("click", () => openArtifactEntry(subitem, artifact));
+          item.appendChild(button);
+          artifactSubitems.appendChild(item);
+        }
+
+        artifactSublist.classList.remove("is-visible");
+      }
+
+      function openArtifactEntry(subitem, artifact) {
+        artifactReaderMeta.textContent = `${artifact.meta} - ${artifact.title}`;
+        artifactReaderTitle.textContent = subitem.title;
+        artifactReaderBody.innerHTML = "";
+
+        const copy = document.createElement("div");
+        copy.className = "artifact-reader-copy";
+        copy.textContent = subitem.desc || "";
+        artifactReaderBody.appendChild(copy);
+
+        if (Array.isArray(subitem.images) && subitem.images.length) {
+          const actions = document.createElement("div");
+          actions.className = "artifact-reader-actions";
+
+          const openGalleryButton = document.createElement("button");
+          openGalleryButton.type = "button";
+          openGalleryButton.className = "artifact-gallery-launch";
+          openGalleryButton.textContent = `Open Photo Gallery (${subitem.images.length})`;
+          openGalleryButton.addEventListener("click", () => openPhotoGallery(subitem.images, subitem.title));
+          actions.appendChild(openGalleryButton);
+          artifactReaderBody.appendChild(actions);
+
+          const note = document.createElement("p");
+          note.className = "artifact-gallery-note";
+          note.textContent = `${subitem.images.length} attached incident photos available in turntable view.`;
+          artifactReaderBody.appendChild(note);
+        }
+
+        artifactReaderBody.scrollTop = 0;
+        artifactView.classList.add("is-reader-open");
+        artifactReader.classList.toggle("has-journal-paper", artifact.title === "Messer Officer Field Journal");
+        artifactReader.classList.remove("has-tape-player");
+        artifactReader.classList.add("is-visible");
+        artifactReader.setAttribute("aria-hidden", "false");
+      }
+
+      function openTapeArtifactEntry(artifact) {
+        const tape = artifact && artifact.tapeFeature;
+        if (!tape) {
+          return;
+        }
+
+        artifactReaderMeta.textContent = `${artifact.meta} - ${artifact.title}`;
+        artifactReaderTitle.textContent = artifact.title;
+        artifactReaderBody.innerHTML = "";
+        artifactAudioWrap.hidden = false;
+        artifactAudioTitle.textContent = tape.audioTitle || artifact.title;
+        if (artifactAudio.getAttribute("src") !== tape.audio) {
+          artifactAudio.src = tape.audio;
+          artifactAudio.load();
+        }
+
+        const layout = document.createElement("div");
+        layout.className = "artifact-tape-reader-layout";
+
+        const copy = document.createElement("div");
+        copy.className = "artifact-tape-reader-copy";
+        copy.innerHTML = `
+          <p>${artifact.desc}</p>
+          <p><strong>Artifact Type:</strong> ${artifact.facts.type}</p>
+          <p><strong>Temporal Anchor:</strong> ${artifact.facts.temporalAnchor}</p>
+          <p><strong>Location:</strong> ${artifact.facts.location}</p>
+          <p><strong>Condition:</strong> ${artifact.facts.condition}</p>
+          <p><strong>Reliability:</strong> ${artifact.facts.reliability}</p>
+        `;
+
+        const stage = document.createElement("div");
+        stage.className = "artifact-tape-reader-stage";
+
+        const image = document.createElement("img");
+        image.className = "artifact-tape-reader-image artifact-tape-state-image";
+        image.src = activeTapeArtifactTitle === artifact.title && !artifactAudio.paused
+          ? tape.activeImage
+          : tape.defaultImage;
+        image.alt = "Recovered tape recorder";
+
+        const playButton = document.createElement("button");
+        playButton.className = "artifact-tape-play";
+        playButton.type = "button";
+        playButton.addEventListener("click", () => toggleTapePlayback(artifact));
+
+        stage.appendChild(image);
+        stage.appendChild(playButton);
+        layout.appendChild(copy);
+        layout.appendChild(stage);
+        artifactReaderBody.appendChild(layout);
+
+        artifactView.classList.add("is-reader-open");
+        artifactReader.classList.remove("has-journal-paper");
+        artifactReader.classList.add("has-tape-player", "is-visible");
+        artifactReader.setAttribute("aria-hidden", "false");
+        setTapePlayState(activeTapeArtifactTitle === artifact.title && !artifactAudio.paused);
+      }
+
+      function closeArtifactEntry() {
+        closePhotoGallery();
+        artifactView.classList.remove("is-reader-open");
+        artifactReader.classList.remove("has-journal-paper");
+        artifactReader.classList.remove("has-tape-player");
+        artifactReader.classList.remove("is-visible");
+        artifactReader.setAttribute("aria-hidden", "true");
+      }
+
+      function getPhotoGalleryClassName(index) {
+        const relativeIndex = (index - activePhotoGalleryIndex + activePhotoGalleryItems.length) % activePhotoGalleryItems.length;
+        if (relativeIndex === 0) return "selected";
+        if (relativeIndex === 1) return "next";
+        if (relativeIndex === 2) return "nextRightSecond";
+        if (relativeIndex === activePhotoGalleryItems.length - 1) return "prev";
+        if (relativeIndex === activePhotoGalleryItems.length - 2) return "prevLeftSecond";
+        return relativeIndex > 2 ? "hideRight" : "hideLeft";
+      }
+
+      function updatePhotoGalleryCarousel() {
+        if (!photoCarousel) {
+          return;
+        }
+
+        [...photoCarousel.children].forEach((slide, index) => {
+          slide.className = `photo-slide ${getPhotoGalleryClassName(index)}`;
+        });
+
+        photoGalleryCount.textContent = `${String(activePhotoGalleryIndex + 1).padStart(2, "0")} / ${String(activePhotoGalleryItems.length).padStart(2, "0")}`;
+      }
+
+      function buildPhotoGalleryCarousel() {
+        if (!photoCarousel) {
+          return;
+        }
+
+        photoCarousel.innerHTML = "";
+        activePhotoGalleryItems.forEach((image, index) => {
+          const slide = document.createElement("div");
+          slide.className = `photo-slide ${getPhotoGalleryClassName(index)}`;
+          slide.innerHTML = `
+            <div class="img-wrap">
+              <img src="${image.src}" alt="${image.alt || photoGalleryTitle.textContent}" loading="lazy">
+              <div class="img-text">${image.caption || `Photo ${String(index + 1).padStart(2, "0")}`}</div>
+            </div>
+          `;
+          slide.addEventListener("click", () => {
+            if (index !== activePhotoGalleryIndex) {
+              activePhotoGalleryIndex = index;
+              updatePhotoGalleryCarousel();
+            }
+          });
+          photoCarousel.appendChild(slide);
+        });
+
+        updatePhotoGalleryCarousel();
+      }
+
+      function movePhotoGallery(direction) {
+        if (!activePhotoGalleryItems.length) {
+          return;
+        }
+        if (direction === "next") {
+          activePhotoGalleryIndex = (activePhotoGalleryIndex + 1) % activePhotoGalleryItems.length;
+        } else {
+          activePhotoGalleryIndex = activePhotoGalleryIndex === 0
+            ? activePhotoGalleryItems.length - 1
+            : activePhotoGalleryIndex - 1;
+        }
+        updatePhotoGalleryCarousel();
+      }
+
+      function openPhotoGallery(images, title, startIndex = 0) {
+        activePhotoGalleryItems = Array.isArray(images) ? images.slice() : [];
+        activePhotoGalleryIndex = Math.max(0, Math.min(startIndex, activePhotoGalleryItems.length - 1));
+        photoGalleryMeta.textContent = "Incident Photography";
+        photoGalleryTitle.textContent = `${title} - Photo Gallery`;
+        buildPhotoGalleryCarousel();
+        photoGallery.classList.add("is-visible");
+        photoGallery.setAttribute("aria-hidden", "false");
+      }
+
+      function closePhotoGallery() {
+        photoGallery.classList.remove("is-visible");
+        photoGallery.setAttribute("aria-hidden", "true");
+        activePhotoGalleryItems = [];
+        activePhotoGalleryIndex = 0;
+        if (photoCarousel) {
+          photoCarousel.innerHTML = "";
+        }
+        photoGalleryCount.textContent = "01 / 01";
+      }
+
+      function renderUnlockedPlaylist(artifact) {
+        artifactPlaylist.hidden = true;
+        artifactPlaylistItems.innerHTML = "";
+      }
+
+      function setTapePlayState(isPlaying) {
+        if (!artifactTapePlay || !artifactTapeImage) {
+          return;
+        }
+        const artifact = activeArtifactItems[activeArtifactItemIndex];
+        const tape = artifact && artifact.tapeFeature;
+        const imageSource = isPlaying && tape ? tape.activeImage : ((tape && tape.defaultImage) || "tape.png");
+        document.querySelectorAll(".artifact-tape-state-image").forEach((image) => {
+          image.src = imageSource;
+        });
+        document.querySelectorAll(".artifact-tape-play").forEach((button) => {
+          button.classList.toggle("is-playing", isPlaying);
+          button.textContent = isPlaying ? "Pause Tape" : "Play Tape";
+          button.setAttribute("aria-label", isPlaying ? "Pause recovered tape" : "Play recovered tape");
+        });
+      }
+
+      function renderTapeFeature(artifact) {
+        const tape = artifact && artifact.tapeFeature;
+        artifactTapeFeature.hidden = !tape;
+        if (!tape) {
+          if (activeTapeArtifactTitle) {
+            artifactAudio.pause();
+            activeTapeArtifactTitle = "";
+          }
+          setTapePlayState(false);
+          return;
+        }
+        setTapePlayState(activeTapeArtifactTitle === artifact.title && !artifactAudio.paused);
+      }
+
+      function playTapeButtonSound() {
+        tapeButtonSound.currentTime = 0;
+        void tapeButtonSound.play().catch(() => {});
+      }
+
+      function toggleTapePlayback(tapeArtifact) {
+        const artifact = tapeArtifact || activeArtifactItems[activeArtifactItemIndex];
+        const tape = artifact && artifact.tapeFeature;
+        if (!tape) {
+          return;
+        }
+
+        playTapeButtonSound();
+        artifactAudioWrap.hidden = false;
+        artifactAudioTitle.textContent = tape.audioTitle || artifact.title;
+        if (activeTapeArtifactTitle !== artifact.title || artifactAudio.getAttribute("src") !== tape.audio) {
+          artifactAudio.src = tape.audio;
+          artifactAudio.load();
+        }
+
+        if (activeTapeArtifactTitle === artifact.title && !artifactAudio.paused) {
+          artifactAudio.pause();
+          setTapePlayState(false);
+          return;
+        }
+
+        activeTapeArtifactTitle = artifact.title;
+        void artifactAudio.play()
+          .then(() => setTapePlayState(true))
+          .catch(() => setTapePlayState(false));
+      }
+
+      function playPlaceholderTrack(track) {
+        artifactAudioWrap.hidden = false;
+        artifactAudioTitle.textContent = `Now Playing: ${track.title}`;
+        if (artifactAudio.getAttribute("src") !== track.file) {
+          artifactAudio.src = track.file;
+          artifactAudio.load();
+        }
+        void artifactAudio.play().catch(() => {});
+      }
+
+      function updateScreenTrackActiveState() {
+        [...modelScreenList.querySelectorAll("button")].forEach((btn, idx) => {
+          btn.classList.toggle("is-active", idx === activeScreenTrackIndex);
+        });
+      }
+
+      function populateModelScreenList() {
+        modelScreenList.innerHTML = "";
+        placeholderTracks.forEach((track, idx) => {
+          const li = document.createElement("li");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = `${String(idx + 1).padStart(2, "0")} - ${track.title}`;
+          button.addEventListener("click", () => {
+            activeScreenTrackIndex = idx;
+            updateScreenTrackActiveState();
+            playPlaceholderTrack(track);
+          });
+          li.appendChild(button);
+          modelScreenList.appendChild(li);
+        });
+        updateScreenTrackActiveState();
+      }
+
+      function renderModelScreenOverlay() {
+        const showOverlay = !!(
+          modelScreenOverlay &&
+          activeModelArtifact &&
+          activeModelArtifact.powerOnPose &&
+          activeModelArtifact.powerOnPose.screenRect &&
+          poweredArtifacts.has(activeModelArtifact.title) &&
+          modelLocked
+        );
+
+        modelScreenOverlay.hidden = !showOverlay;
+        if (!showOverlay) {
+          return;
+        }
+
+        if (!modelScreenList.childElementCount) {
+          populateModelScreenList();
+        }
+
+        const rect = modelCanvas.getBoundingClientRect();
+        const screenRect = activeModelArtifact.powerOnPose.screenRect;
+        const c = screenRect.center;
+        const halfW = (screenRect.widthWorld || 0.2) / 2;
+        const halfH = (screenRect.heightWorld || 0.14) / 2;
+        const centerWorld = new THREE.Vector3(c.x, c.y, c.z);
+
+        // Build a camera-aligned plane at the anchor point so overlay scaling
+        // stays correct regardless of camera direction/aspect.
+        const forward = new THREE.Vector3();
+        modelCamera.getWorldDirection(forward);
+        const rightVec = new THREE.Vector3().crossVectors(forward, modelCamera.up).normalize();
+        const upVec = new THREE.Vector3().crossVectors(rightVec, forward).normalize();
+
+        const rightWorld = centerWorld.clone().add(rightVec.multiplyScalar(halfW));
+        const upWorld = centerWorld.clone().add(upVec.multiplyScalar(halfH));
+
+        const center = centerWorld.clone().project(modelCamera);
+        const right = rightWorld.project(modelCamera);
+        const up = upWorld.project(modelCamera);
+
+        const cx = ((center.x + 1) / 2) * rect.width;
+        const cy = ((-center.y + 1) / 2) * rect.height;
+        const rw = Math.abs((((right.x + 1) / 2) * rect.width) - cx) * 2;
+        const rh = Math.abs((((-up.y + 1) / 2) * rect.height) - cy) * 2;
+
+        const minW = 150;
+        const maxW = Math.min(280, rect.width * 0.52);
+        const w = Math.max(minW, Math.min(maxW, rw));
+        const h = Math.max(92, Math.min(220, rh));
+
+        const clampedX = Math.max(w / 2, Math.min(rect.width - w / 2, cx));
+        const clampedY = Math.max(h / 2, Math.min(rect.height - h / 2, cy));
+
+        modelScreenOverlay.style.left = `${clampedX}px`;
+        modelScreenOverlay.style.top = `${clampedY}px`;
+        modelScreenOverlay.style.width = `${w}px`;
+      }
+
+      function renderModelTrackPanel(artifact) {
+        const showPanel = false;
+        modelTrackPanel.hidden = !showPanel;
+        modelTrackItems.innerHTML = "";
+        modelViewerStage.classList.toggle("has-track-panel", showPanel);
+        if (!showPanel) {
+          return;
+        }
+
+        placeholderTracks.forEach((track, idx) => {
+          const item = document.createElement("li");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = `${String(idx + 1).padStart(2, "0")} - ${track.title}`;
+          button.addEventListener("click", () => playPlaceholderTrack(track));
+          item.appendChild(button);
+          modelTrackItems.appendChild(item);
+        });
+      }
+
+      function initModelViewer() {
+        if (modelRenderer || typeof THREE === "undefined" || !modelCanvas) {
+          return;
+        }
+        modelScene = new THREE.Scene();
+        modelScene.background = new THREE.Color(0x050403);
+        modelCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
+        modelCamera.position.set(0, 1.4, 4.2);
+
+        const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+        modelScene.add(ambient);
+        const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        keyLight.position.set(2, 4, 3);
+        modelScene.add(keyLight);
+
+        modelRenderer = new THREE.WebGLRenderer({ antialias: true });
+        modelRenderer.setPixelRatio(window.devicePixelRatio || 1);
+        if ("outputColorSpace" in modelRenderer && "SRGBColorSpace" in THREE) {
+          modelRenderer.outputColorSpace = THREE.SRGBColorSpace;
+        } else if ("outputEncoding" in modelRenderer && "sRGBEncoding" in THREE) {
+          modelRenderer.outputEncoding = THREE.sRGBEncoding;
+        }
+        modelCanvas.appendChild(modelRenderer.domElement);
+
+        modelControls = new THREE.OrbitControls(modelCamera, modelRenderer.domElement);
+        modelControls.enableDamping = true;
+        modelControls.dampingFactor = 0.06;
+        modelControls.enablePan = true;
+        modelControls.minDistance = 0.4;
+        modelControls.maxDistance = 30;
+
+        modelLoader = new THREE.GLTFLoader();
+        if (typeof THREE.DRACOLoader !== "undefined") {
+          const dracoLoader = new THREE.DRACOLoader();
+          dracoLoader.setDecoderPath("./vendor/draco/");
+          modelLoader.setDRACOLoader(dracoLoader);
+        }
+      }
+
+      function resizeModelViewer() {
+        if (!modelRenderer || !modelCamera || !modelCanvas) {
+          return;
+        }
+        const rect = modelCanvas.getBoundingClientRect();
+        const width = Math.max(1, Math.floor(rect.width));
+        const height = Math.max(1, Math.floor(rect.height));
+        modelRenderer.setSize(width, height, false);
+        modelCamera.aspect = width / height;
+        modelCamera.updateProjectionMatrix();
+        renderModelScreenOverlay();
+      }
+
+      function getModelViewportMetrics() {
+        if (!modelCanvas) {
+          return { width: 1, height: 1, aspect: 1 };
+        }
+        const rect = modelCanvas.getBoundingClientRect();
+        const width = Math.max(1, rect.width);
+        const height = Math.max(1, rect.height);
+        return { width, height, aspect: width / height };
+      }
+
+      function computeFrameDistance(maxDim, aspect, verticalFovDeg) {
+        const vFov = (verticalFovDeg * Math.PI) / 180;
+        const hFov = 2 * Math.atan(Math.tan(vFov / 2) * Math.max(0.25, aspect));
+        const distV = (maxDim / 2) / Math.tan(vFov / 2);
+        const distH = (maxDim / 2) / Math.tan(hFov / 2);
+        return Math.max(distV, distH);
+      }
+
+      function fitModelToView(object3d) {
+        if (!modelCamera || !modelControls) {
+          return;
+        }
+        const box = new THREE.Box3().setFromObject(object3d);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const viewport = getModelViewportMetrics();
+        const baseDistance = computeFrameDistance(maxDim, viewport.aspect, modelCamera.fov);
+        const mobileBoost = viewport.width < 900 ? 1.2 : 1.08;
+        const distance = Math.max(baseDistance * mobileBoost, maxDim * 0.95);
+
+        object3d.position.sub(center);
+        modelCamera.position.set(0, maxDim * 0.22, distance);
+        modelCamera.near = Math.max(0.01, distance / 100);
+        modelCamera.far = distance * 100;
+        modelCamera.updateProjectionMatrix();
+        modelControls.target.set(0, 0, 0);
+        modelControls.minDistance = Math.max(distance * 0.18, maxDim * 0.08);
+        modelControls.maxDistance = Math.max(distance * 4.0, maxDim * 2.5);
+        modelControls.update();
+        lastFitDistance = distance;
+      }
+
+      function normalizeModelScale(object3d, targetMaxDim) {
+        if (!object3d || !targetMaxDim) {
+          return;
+        }
+        const box = new THREE.Box3().setFromObject(object3d);
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const scaleFactor = targetMaxDim / maxDim;
+        object3d.scale.multiplyScalar(scaleFactor);
+      }
+
+      function renderModelFrame() {
+        if (!modelRenderer || !modelScene || !modelCamera || !modelControls) {
+          return;
+        }
+        if (modelControls.enabled) {
+          modelControls.update();
+        }
+        renderModelScreenOverlay();
+        modelRenderer.render(modelScene, modelCamera);
+        modelAnimationId = window.requestAnimationFrame(renderModelFrame);
+      }
+
+      function stopModelFrame() {
+        if (modelAnimationId) {
+          window.cancelAnimationFrame(modelAnimationId);
+          modelAnimationId = 0;
+        }
+      }
+
+      function stopPowerOnCinematic() {
+        if (cinematicAnimationId) {
+          window.cancelAnimationFrame(cinematicAnimationId);
+          cinematicAnimationId = 0;
+        }
+      }
+
+      function runPowerOnCinematic() {
+        if (!loadedModel || !modelCamera || !modelControls) {
+          return;
+        }
+        stopPowerOnCinematic();
+        modelStatus.textContent = "Powering on...";
+        modelControls.enabled = false;
+        modelLocked = false;
+
+        const box = new THREE.Box3().setFromObject(loadedModel);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const pose = (activeModelArtifact && activeModelArtifact.powerOnPose) || null;
+        if (pose && pose.instantLock) {
+          if (pose.modelPos) {
+            loadedModel.position.set(pose.modelPos.x, pose.modelPos.y, pose.modelPos.z);
+          }
+          loadedModel.rotation.set(
+            typeof pose.x === "number" ? pose.x : loadedModel.rotation.x,
+            typeof pose.y === "number" ? pose.y : loadedModel.rotation.y,
+            typeof pose.z === "number" ? pose.z : loadedModel.rotation.z
+          );
+          if (pose.cameraPos) {
+            modelCamera.position.set(pose.cameraPos.x, pose.cameraPos.y, pose.cameraPos.z);
+          }
+          if (pose.target) {
+            modelControls.target.set(pose.target.x, pose.target.y, pose.target.z);
+          }
+          modelControls.update();
+          modelLocked = true;
+          modelStatus.textContent = "Powered on. View locked.";
+          return;
+        }
+
+        const startPos = modelCamera.position.clone();
+        const startTarget = modelControls.target.clone();
+        const startModelPos = loadedModel.position.clone();
+        const startRotX = loadedModel.rotation.x;
+        const startRotY = loadedModel.rotation.y;
+        const startRotZ = loadedModel.rotation.z;
+        const endRotX = pose && typeof pose.x === "number" ? pose.x : (startRotX - Math.PI * 0.5);
+        const endRotY = pose && typeof pose.y === "number" ? pose.y : startRotY;
+        const endRotZ = pose && typeof pose.z === "number" ? pose.z : startRotZ;
+
+        const viewport = getModelViewportMetrics();
+        const zoomFactor = pose && typeof pose.zoom === "number" ? pose.zoom : 0.22;
+        const zoomFromFit = Math.max(lastFitDistance * zoomFactor, maxDim * 0.14);
+        const narrowBoost = viewport.width < 700 ? 1.25 : 1.0;
+        const zoomDistance = zoomFromFit * narrowBoost;
+        const targetY = size.y * (pose && typeof pose.targetY === "number" ? pose.targetY : 0.05);
+        const endPos = pose && pose.cameraPos
+          ? new THREE.Vector3(pose.cameraPos.x, pose.cameraPos.y, pose.cameraPos.z)
+          : new THREE.Vector3(center.x, center.y + targetY, center.z + zoomDistance);
+        const endTarget = pose && pose.target
+          ? new THREE.Vector3(pose.target.x, pose.target.y, pose.target.z)
+          : new THREE.Vector3(center.x, center.y + targetY, center.z);
+        const endModelPos = pose && pose.modelPos
+          ? new THREE.Vector3(pose.modelPos.x, pose.modelPos.y, pose.modelPos.z)
+          : startModelPos.clone();
+        const startTime = performance.now();
+        const turnMs = 260;
+        const zoomMs = 420;
+
+        const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+
+        const step = (now) => {
+          const elapsed = now - startTime;
+          if (elapsed <= turnMs) {
+            const t = easeOut(Math.min(1, elapsed / turnMs));
+            loadedModel.rotation.x = startRotX + (endRotX - startRotX) * t;
+            loadedModel.rotation.y = startRotY + (endRotY - startRotY) * t;
+            loadedModel.rotation.z = startRotZ + (endRotZ - startRotZ) * t;
+          } else {
+            const t = easeOut(Math.min(1, (elapsed - turnMs) / zoomMs));
+            modelCamera.position.lerpVectors(startPos, endPos, t);
+            modelControls.target.lerpVectors(startTarget, endTarget, t);
+            loadedModel.position.lerpVectors(startModelPos, endModelPos, t);
+            loadedModel.rotation.x = endRotX;
+            loadedModel.rotation.y = endRotY;
+            loadedModel.rotation.z = endRotZ;
+          }
+
+          if (elapsed < turnMs + zoomMs) {
+            cinematicAnimationId = window.requestAnimationFrame(step);
+            return;
+          }
+
+          modelCamera.position.copy(endPos);
+          modelControls.target.copy(endTarget);
+          loadedModel.position.copy(endModelPos);
+          modelLocked = true;
+          modelStatus.textContent = "Powered on. Focus locked on player screen.";
+          stopPowerOnCinematic();
+        };
+
+        cinematicAnimationId = window.requestAnimationFrame(step);
+      }
+
+      function loadModel(path, onLoaded) {
+        if (!modelLoader || !modelScene) {
+          return;
+        }
+        const sourcePath = /^https?:\/\//.test(path) || path.startsWith("./") ? path : `./${path}`;
+        currentModelPath = sourcePath;
+        modelStatus.textContent = "Loading model...";
+
+        if (loadedModel) {
+          modelScene.remove(loadedModel);
+          loadedModel = null;
+        }
+
+        modelLoader.load(
+          sourcePath,
+          (gltf) => {
+            loadedModel = gltf.scene;
+            modelScene.add(loadedModel);
+            if (activeModelArtifact && activeModelArtifact.modelMaxDim) {
+              normalizeModelScale(loadedModel, activeModelArtifact.modelMaxDim);
+            }
+            fitModelToView(loadedModel);
+            modelStatus.textContent = "Drag to rotate, wheel to zoom, right-drag to pan.";
+            if (onLoaded) {
+              onLoaded();
+            }
+          },
+          undefined,
+          (error) => {
+            const message = error && error.message ? error.message : "unknown loader error";
+            modelStatus.textContent = `Could not load "${sourcePath}". ${message}`;
+            console.error("GLB load failed:", error);
+          }
+        );
+      }
+
+      function openModelViewer(path, title, artifact) {
+        initModelViewer();
+        if (!modelRenderer || !modelScene || !modelCamera || typeof THREE.GLTFLoader === "undefined") {
+          modelStatus.textContent = "3D viewer unavailable.";
+          modelViewer.classList.add("is-visible");
+          modelViewer.setAttribute("aria-hidden", "false");
+          return;
+        }
+
+        activeModelArtifact = artifact || null;
+        modelViewerTitle.textContent = title || "Interactive Object";
+        const hasOnModel = !!(activeModelArtifact && activeModelArtifact.modelOn && !poweredArtifacts.has(activeModelArtifact.title));
+        modelToggleOn.hidden = !hasOnModel;
+        modelToggleOn.disabled = false;
+        modelLocked = false;
+        if (modelControls) {
+          modelControls.enabled = true;
+        }
+        modelScreenOverlay.hidden = true;
+        modelScreenList.innerHTML = "";
+        activeScreenTrackIndex = -1;
+        renderModelTrackPanel(activeModelArtifact);
+        modelViewer.classList.add("is-visible");
+        modelViewer.setAttribute("aria-hidden", "false");
+        resizeModelViewer();
+        if (!modelAnimationId) {
+          renderModelFrame();
+        }
+
+        loadModel(path);
+      }
+
+      function closeModelViewer() {
+        modelViewer.classList.remove("is-visible");
+        modelViewer.setAttribute("aria-hidden", "true");
+        modelToggleOn.hidden = true;
+        modelTrackPanel.hidden = true;
+        modelTrackItems.innerHTML = "";
+        modelViewerStage.classList.remove("has-track-panel");
+        modelScreenOverlay.hidden = true;
+        modelScreenList.innerHTML = "";
+        if (activeModelArtifact && activeModelArtifact.title) {
+          poweredArtifacts.delete(activeModelArtifact.title);
+        }
+        activeScreenTrackIndex = -1;
+        activeModelArtifact = null;
+        currentModelPath = "";
+        modelLocked = false;
+        if (modelControls) {
+          modelControls.enabled = true;
+        }
+        stopPowerOnCinematic();
+        stopModelFrame();
+      }
+
+      function renderArtifactDial() {
+        artifactDialStack.innerHTML = "";
+        activeArtifactItems.forEach((artifact, artifactIndex) => {
+          const item = document.createElement("div");
+          item.className = "artifact-dial-item";
+          item.textContent = artifact.title;
+          item.classList.toggle("is-active", artifactIndex === activeArtifactItemIndex);
+          artifactDialStack.appendChild(item);
+        });
+      }
+
+      function updateArtifactDialPosition(value) {
+        artifactDialCount.textContent = String(activeArtifactItemIndex + 1).padStart(2, "0");
+        const itemHeight = window.matchMedia("(max-width: 760px)").matches ? 40 : 50;
+        const centerOffset = window.matchMedia("(max-width: 760px)").matches ? 60 : 75;
+        artifactDialStack.style.transform = `translateY(${centerOffset - value * itemHeight}px)`;
+        if (artifactStepUp) {
+          artifactStepUp.disabled = activeArtifactItemIndex <= 0;
+        }
+        if (artifactStepDown) {
+          artifactStepDown.disabled = activeArtifactItemIndex >= activeArtifactItems.length - 1;
+        }
+      }
+
+      function shiftArtifactSelection(delta) {
+        const nextIndex = Math.max(0, Math.min(activeArtifactItems.length - 1, activeArtifactItemIndex + delta));
+        if (nextIndex === activeArtifactItemIndex) {
+          return;
+        }
+        activeArtifactItemIndex = nextIndex;
+        renderArtifactDial();
+        updateArtifactDialPosition(activeArtifactItemIndex);
+        renderArtifactDetail();
+      }
+
+      function renderArtifacts(slide) {
+        artifactKicker.textContent = slide.banner;
+        artifactTitle.textContent = slide.title;
+        artifactSubtitle.textContent = `Recovered entries and remnants associated with ${slide.year}.`;
+        activeArtifactItems = getArtifactsForSlide(slide);
+        activeArtifactItemIndex = 0;
+        renderArtifactDial();
+        updateArtifactDialPosition(0);
+        renderArtifactDetail();
+      }
+
+      function openArtifactView(slide) {
+        renderArtifacts(slide);
+        bgFade.classList.add("is-active");
+
+        window.setTimeout(() => {
+          artifactView.classList.add("is-visible");
+          bgFade.classList.add("is-revealing");
+        }, 360);
+
+        window.setTimeout(() => {
+          bgFade.classList.remove("is-active", "is-revealing");
+        }, 1050);
+      }
+
+      function closeArtifactView() {
+        closeArtifactEntry();
+        closeModelViewer();
+        artifactAudio.pause();
+        activeTapeArtifactTitle = "";
+        setTapePlayState(false);
+        artifactView.classList.remove("is-reader-open");
+        bgFade.classList.add("is-active");
+
+        window.setTimeout(() => {
+          artifactView.classList.remove("is-visible");
+          bgFade.classList.add("is-revealing");
+        }, 280);
+
+        window.setTimeout(() => {
+          bgFade.classList.remove("is-active", "is-revealing");
+        }, 920);
+      }
+
+      function renderSlide() {
+        const slide = slides[index];
+        dialPercent = slide.position;
+        timelineDial.value = String(slide.position);
+        timelineCount.textContent = slide.number;
+        timelineHeaderTitle.textContent = slide.header;
+        dateNumber.textContent = slide.number;
+        dayName.textContent = slide.day;
+        eyeline.textContent = slide.banner;
+        slideTitle.textContent = slide.title;
+        slideYear.textContent = slide.year;
+        slideDesc.textContent = slide.desc;
+        detailTag1.textContent = slide.tags[0] || "";
+        detailTag2.textContent = slide.tags[1] || "";
+        detailNotes.textContent = slide.notes || "";
+
+        [...timelineIndex.querySelectorAll("button")].forEach((button, buttonIndex) => {
+          button.classList.toggle("is-active", buttonIndex === index);
+        });
+
+        updateSignal(dialPercent);
+        updateTimelineBackground(slide);
+      }
+
+      timelineDial.addEventListener("input", () => {
+        dialPercent = Number(timelineDial.value);
+        updateSignal(dialPercent);
+        dialState.textContent = "Tuning";
+
+        const nextIndex = getActiveSlideIndex(dialPercent);
+        if (nextIndex !== index) {
+          index = nextIndex;
+          renderSlide();
+        }
+      });
+
+      timelineDial.addEventListener("change", () => {
+        dialPercent = slides[getNearestSlideIndex(Number(timelineDial.value))].position;
+        timelineDial.value = String(dialPercent);
+        updateSignal(dialPercent);
+        dialState.textContent = "Locked";
+
+        const nextIndex = getNearestSlideIndex(dialPercent);
+        if (nextIndex !== index) {
+          index = nextIndex;
+          renderSlide();
+        }
+      });
+
+      artifactClose.addEventListener("click", closeArtifactView);
+      artifactTapePlay.addEventListener("click", toggleTapePlayback);
+      artifactAudio.addEventListener("pause", () => {
+        const artifact = activeArtifactItems[activeArtifactItemIndex];
+        if (artifact && artifact.tapeFeature && activeTapeArtifactTitle === artifact.title) {
+          setTapePlayState(false);
+        }
+      });
+      artifactAudio.addEventListener("ended", () => {
+        activeTapeArtifactTitle = "";
+        setTapePlayState(false);
+      });
+      artifactAudio.addEventListener("play", () => {
+        const artifact = activeArtifactItems[activeArtifactItemIndex];
+        if (artifact && artifact.tapeFeature && activeTapeArtifactTitle === artifact.title) {
+          setTapePlayState(true);
+        }
+      });
+      artifactEnter.addEventListener("click", () => {
+        const artifact = activeArtifactItems[activeArtifactItemIndex];
+        if (artifact && artifact.tapeFeature) {
+          openTapeArtifactEntry(artifact);
+          return;
+        }
+        artifactSublist.classList.add("is-visible");
+      });
+      artifactModelOpen.addEventListener("click", () => {
+        const artifact = activeArtifactItems[activeArtifactItemIndex];
+        const modelPath = artifact && artifact.modelOn && poweredArtifacts.has(artifact.title)
+          ? artifact.modelOn
+          : ((artifact && artifact.model) || "messer.glb");
+        const modelTitle = artifact ? `${artifact.title} - 3D Model` : "Interactive Object";
+        openModelViewer(modelPath, modelTitle, artifact);
+      });
+      artifactReaderClose.addEventListener("click", closeArtifactEntry);
+      artifactReader.addEventListener("click", (event) => {
+        if (event.target === artifactReader) {
+          closeArtifactEntry();
+        }
+      });
+      photoGalleryClose.addEventListener("click", closePhotoGallery);
+      photoGalleryPrev.addEventListener("click", () => movePhotoGallery("prev"));
+      photoGalleryNext.addEventListener("click", () => movePhotoGallery("next"));
+      photoGallery.addEventListener("click", (event) => {
+        if (event.target === photoGallery) {
+          closePhotoGallery();
+        }
+      });
+      modelViewerClose.addEventListener("click", closeModelViewer);
+      modelToggleOn.addEventListener("click", () => {
+        if (!activeModelArtifact || !activeModelArtifact.modelOn) {
+          return;
+        }
+        const targetPath = activeModelArtifact.modelOn;
+        if (currentModelPath === `./${targetPath}`) {
+          return;
+        }
+        loadModel(targetPath, () => {
+          runPowerOnCinematic();
+        });
+        poweredArtifacts.add(activeModelArtifact.title);
+        modelToggleOn.disabled = true;
+        modelToggleOn.hidden = true;
+        renderModelTrackPanel(activeModelArtifact);
+        window.setTimeout(() => {
+          resizeModelViewer();
+        }, 60);
+      });
+      modelViewer.addEventListener("click", (event) => {
+        if (event.target === modelViewer) {
+          closeModelViewer();
+        }
+      });
+      artifactStepUp.addEventListener("click", () => shiftArtifactSelection(-1));
+      artifactStepDown.addEventListener("click", () => shiftArtifactSelection(1));
+      window.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") {
+          if (photoGallery.classList.contains("is-visible")) {
+            if (event.key === "ArrowLeft") {
+              movePhotoGallery("prev");
+            } else if (event.key === "ArrowRight") {
+              movePhotoGallery("next");
+            }
+          }
+          return;
+        }
+        if (photoGallery.classList.contains("is-visible")) {
+          closePhotoGallery();
+          return;
+        }
+        if (artifactReader.classList.contains("is-visible")) {
+          closeArtifactEntry();
+          return;
+        }
+        if (modelViewer.classList.contains("is-visible")) {
+          closeModelViewer();
+          return;
+        }
+        if (artifactView.classList.contains("is-visible")) {
+          closeArtifactView();
+        }
+      });
+
+      enterButton.addEventListener("click", () => {
+        enterButton.disabled = true;
+        try {
+          swooshAudio.currentTime = 0;
+          void swooshAudio.play();
+        } catch {}
+        bgFade.classList.add("is-active");
+        landing.classList.add("is-leaving");
+
+        window.setTimeout(() => {
+          timelineApp.classList.add("is-active");
+          document.body.classList.add("timeline-active");
+        }, 500);
+
+        window.setTimeout(() => {
+          bgFade.classList.add("is-revealing");
+        }, 1050);
+
+        window.setTimeout(() => {
+          bgFade.classList.remove("is-active", "is-revealing");
+          document.body.style.overflow = "auto";
+        }, 1900);
+      });
+
+      buildMonthDial();
+      buildIndex();
+      renderSlide();
+      timelineDial.min = "0";
+      timelineDial.max = "100";
+      timelineDial.step = "0.01";
+      updateSignal(slides[0].position);
+      window.addEventListener("resize", () => updateSignal(dialPercent));
+      window.addEventListener("resize", () => updateArtifactDialPosition(activeArtifactItemIndex));
+      window.addEventListener("resize", resizeModelViewer);
+    })();
+  </script>
+</body>
+</html>
