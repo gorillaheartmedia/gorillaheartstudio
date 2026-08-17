@@ -603,41 +603,67 @@ section{
 .hub-links-section{
   min-height: auto;
   overflow: visible;
-  padding: 72px 5vw;
+  padding: 0;
   background-color: #fff;
 }
 
 .hub-links-grid{
-  width: min(100%, 1500px);
+  width: 100%;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
+  display: flex;
+  align-items: stretch;
 }
 
 .hub-link-card{
-  display: block;
-  min-height: 220px;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-height: 132px;
   background-color: #f4f4f4;
-  border: 1px solid #dedede;
+  border-right: 1px solid #dedede;
   color: #000;
-  padding: 28px;
+  padding: 28px 6vw;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.hub-link-card:first-child{
+  border-left: 0;
+}
+
+.hub-link-card:hover{
+  background-color: #050505;
+  color: #fff;
 }
 
 .hub-link-card span{
   display: block;
-  color: #000;
+  color: inherit;
   font-family: Impact, "Arial Black", Arial, sans-serif;
-  font-size: 38px;
+  font-size: clamp(34px, 5vw, 76px);
   line-height: 1;
-  margin-bottom: 18px;
   text-transform: uppercase;
 }
 
-.hub-link-card p{
-  color: #303030;
-  font-size: 16px;
-  line-height: 1.55;
+.hub-link-banner{
+  min-height: 240px;
+  padding: 0;
+  background-color: #050505;
+  overflow: hidden;
+}
+
+.hub-link-banner img{
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease, filter 0.5s ease;
+}
+
+.hub-link-banner:hover img{
+  filter: brightness(1.08);
+  transform: scale(1.025);
 }
 
 .about-page{
@@ -645,6 +671,10 @@ section{
 }
 
 .news-page{
+  background-color: #fff;
+}
+
+.apps-page{
   background-color: #fff;
 }
 
@@ -656,7 +686,20 @@ section{
   padding: 86px 6vw 64px;
 }
 
+.apps-page-hero{
+  min-height: auto;
+  overflow: visible;
+  background-color: #0b0b0b;
+  color: #fff;
+  padding: 86px 6vw 64px;
+}
+
 .news-page-inner{
+  width: min(100%, 1120px);
+  margin: 0 auto;
+}
+
+.apps-page-inner{
   width: min(100%, 1120px);
   margin: 0 auto;
 }
@@ -671,11 +714,98 @@ section{
   text-transform: uppercase;
 }
 
+.apps-page-hero h1{
+  color: #fff;
+  font-family: Impact, "Arial Black", Arial, sans-serif;
+  font-size: clamp(72px, 9vw, 150px);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .news-posts-section{
   min-height: auto;
   overflow: visible;
   background-color: #fff;
   padding: 72px 6vw;
+}
+
+.apps-list-section{
+  min-height: auto;
+  overflow: visible;
+  background-color: #fff;
+  padding: 72px 6vw;
+}
+
+.app-project{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 34px;
+  border-top: 8px solid #000;
+  color: #050505;
+  padding-top: 24px;
+}
+
+.app-status{
+  color: #004a98;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.app-project h2{
+  color: #050505;
+  font-family: Impact, "Arial Black", Arial, sans-serif;
+  font-size: clamp(44px, 6vw, 88px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: 0;
+  margin-bottom: 28px;
+  text-transform: uppercase;
+}
+
+.app-project-copy{
+  display: grid;
+  gap: 20px;
+}
+
+.app-project-copy p{
+  color: #202020;
+  font-size: 21px;
+  line-height: 1.6;
+}
+
+.app-project-copy .app-status{
+  color: #004a98;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.app-project-link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 58px;
+  border: 2px solid #000;
+  background-color: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 16px 22px;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  white-space: nowrap;
+}
+
+.app-project-link:hover{
+  background-color: #fff;
+  color: #000;
 }
 
 .news-post{
@@ -1017,8 +1147,7 @@ section{
     min-height: auto;
   }
 
-  .hub-hero-inner,
-  .hub-links-grid{
+  .hub-hero-inner{
     grid-template-columns: 1fr;
   }
 
@@ -1040,6 +1169,21 @@ section{
     font-size: 18px;
   }
 
+  .hub-links-grid{
+    flex-direction: column;
+  }
+
+  .hub-link-card{
+    min-height: 104px;
+    border-right: 0;
+    border-bottom: 1px solid #dedede;
+  }
+
+  .hub-link-banner,
+  .hub-link-banner img{
+    min-height: 220px;
+  }
+
   .about-hero{
     padding: 54px 7vw;
   }
@@ -1048,8 +1192,30 @@ section{
     padding: 54px 7vw 42px;
   }
 
+  .apps-page-hero{
+    padding: 54px 7vw 42px;
+  }
+
   .news-posts-section{
     padding: 48px 7vw;
+  }
+
+  .apps-list-section{
+    padding: 48px 7vw;
+  }
+
+  .app-project{
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .app-project-copy p{
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  .app-project-link{
+    width: 100%;
   }
 
   .news-post-copy p{
