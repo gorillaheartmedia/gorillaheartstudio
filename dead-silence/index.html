@@ -1015,201 +1015,6 @@
       text-transform:uppercase;
       color:#d8ccb1;
     }
-    .model-viewer{
-      position:fixed;
-      inset:0;
-      z-index:13;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      background:rgba(2,2,2,.9);
-    }
-    .model-viewer.is-visible{
-      display:flex;
-    }
-    .model-viewer-card{
-      width:min(1100px, 100%);
-      height:min(82vh, 860px);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:20px;
-      background:linear-gradient(rgba(9,7,6,.96), rgba(13,10,8,.96));
-      box-shadow:0 20px 60px rgba(0,0,0,.45);
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-    }
-    .model-viewer-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      padding:16px 18px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .model-viewer-actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .model-toggle{
-      border:1px solid rgba(217,193,95,.4);
-      background:rgba(217,193,95,.08);
-      color:#f2df9a;
-      border-radius:999px;
-      padding:10px 16px;
-      font-family:Arial, Helvetica, sans-serif;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      cursor:pointer;
-    }
-    .model-viewer-head p{
-      margin:0 0 6px;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:11px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      color:#f2df9a;
-    }
-    .model-viewer-head h4{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:22px;
-      color:#f0ebe0;
-      line-height:1.2;
-    }
-    .model-viewer-close{
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(255,255,255,.04);
-      color:#f0ebe0;
-      border-radius:999px;
-      padding:10px 16px;
-      font-family:Arial, Helvetica, sans-serif;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      cursor:pointer;
-      flex:0 0 auto;
-    }
-    .model-viewer-stage{
-      position:relative;
-      flex:1;
-      min-height:0;
-    }
-    .model-viewer-stage.has-track-panel .model-canvas{
-      right:300px;
-    }
-    .model-canvas{
-      position:absolute;
-      inset:0;
-    }
-    .model-track-panel{
-      position:absolute;
-      right:0;
-      top:0;
-      bottom:0;
-      width:300px;
-      padding:14px;
-      border-left:1px solid rgba(255,255,255,.1);
-      background:rgba(8,7,6,.85);
-      overflow:auto;
-    }
-    .model-track-panel p{
-      margin:0 0 8px;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:11px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color:#f2df9a;
-    }
-    .model-track-panel ul{
-      list-style:none;
-      margin:0;
-      padding:0;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .model-track-panel button{
-      width:100%;
-      text-align:left;
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:12px;
-      padding:10px 12px;
-      background:rgba(255,255,255,.03);
-      color:#e8e1d3;
-      font-family:Arial, Helvetica, sans-serif;
-      letter-spacing:.05em;
-      cursor:pointer;
-    }
-    .model-status{
-      position:absolute;
-      left:14px;
-      bottom:12px;
-      margin:0;
-      padding:8px 10px;
-      border-radius:10px;
-      background:rgba(0,0,0,.45);
-      color:#ddd4c5;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:12px;
-      letter-spacing:.05em;
-    }
-    .model-screen-overlay{
-      position:absolute;
-      z-index:5;
-      width:220px;
-      padding:8px;
-      border:1px solid rgba(255,255,255,.22);
-      border-radius:10px;
-      background:rgba(5,5,5,.72);
-      backdrop-filter:blur(2px);
-      color:#e8e1d3;
-      pointer-events:auto;
-      transform:translate(-50%, -50%);
-    }
-    .model-screen-overlay p{
-      margin:0 0 6px;
-      font-family:Consolas, "Courier New", monospace;
-      font-size:10px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      color:#7dff9b;
-      opacity:.9;
-    }
-    .model-screen-overlay ul{
-      margin:0;
-      padding:0;
-      list-style:none;
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-    }
-    .model-screen-overlay button{
-      width:100%;
-      text-align:left;
-      border:1px solid rgba(125,255,155,.16);
-      border-radius:4px;
-      padding:4px 6px;
-      background:transparent;
-      color:#7dff9b;
-      font-family:Consolas, "Courier New", monospace;
-      font-size:11px;
-      letter-spacing:.04em;
-      line-height:1.3;
-      cursor:pointer;
-      transition:background .12s linear, color .12s linear, border-color .12s linear;
-    }
-    .model-screen-overlay button:hover{
-      border-color:rgba(125,255,155,.35);
-      background:rgba(0,0,0,.45);
-    }
-    .model-screen-overlay button.is-active{
-      background:#000;
-      color:#f5ffb6;
-      border-color:rgba(245,255,182,.45);
-    }
     .timeline-bg{
       position:fixed;
       inset:0;
@@ -1605,10 +1410,6 @@
       .artifact-browser{
         grid-template-columns:280px 1fr;
       }
-      .model-viewer-card{
-        width:min(980px, 100%);
-        height:min(84vh, 760px);
-      }
     }
     @media (max-width: 980px){
       .timeline-overlay{
@@ -1677,19 +1478,6 @@
       }
       .photo-slide.nextRightSecond{
         transform:translate3d(calc(-50% + 340px), -50%, -250px) rotateY(-58deg) scale(.64);
-      }
-      .model-viewer{
-        padding:10px;
-      }
-      .model-viewer-card{
-        width:100%;
-        height:86vh;
-      }
-      .model-viewer-head{
-        padding:12px 12px;
-      }
-      .model-viewer-head h4{
-        font-size:18px;
       }
     }
     @media (max-width: 760px){
@@ -1775,27 +1563,6 @@
       .artifact-dial-item{
         height:40px;
         font-size:15px;
-      }
-      .model-track-panel{
-        width:auto;
-        left:0;
-        right:0;
-        top:auto;
-        bottom:0;
-        height:180px;
-      }
-      .model-viewer-stage.has-track-panel .model-canvas{
-        right:0;
-        bottom:180px;
-      }
-      .model-viewer-actions{
-        width:100%;
-        justify-content:flex-start;
-      }
-      .model-toggle,
-      .model-viewer-close{
-        padding:8px 12px;
-        font-size:11px;
       }
       .artifact-reader.has-journal-paper{
         padding:14px;
@@ -1894,12 +1661,6 @@
       .artifact-model{
         width:100%;
       }
-      .model-status{
-        left:8px;
-        right:8px;
-        bottom:8px;
-        font-size:11px;
-      }
     }
     @media (max-height: 760px){
       .timeline-content{
@@ -1910,9 +1671,6 @@
       }
       .timeline-mark span{
         font-size:11px;
-      }
-      .model-viewer-card{
-        height:90vh;
       }
     }
   </style>
@@ -2067,39 +1825,9 @@
           </div>
         </div>
       </div>
-      <div class="model-viewer" id="modelViewer" aria-modal="true" role="dialog" aria-hidden="true">
-        <div class="model-viewer-card">
-          <div class="model-viewer-head">
-            <div>
-              <p>Object Viewer</p>
-              <h4 id="modelViewerTitle">Interactive Object</h4>
-            </div>
-            <div class="model-viewer-actions">
-              <button class="model-toggle" id="modelToggleOn" type="button" hidden>Turn On</button>
-              <button class="model-viewer-close" id="modelViewerClose" type="button">Return</button>
-            </div>
-          </div>
-          <div class="model-viewer-stage" id="modelViewerStage">
-            <div class="model-canvas" id="modelCanvas"></div>
-            <div class="model-screen-overlay" id="modelScreenOverlay" hidden>
-              <p>Player Queue</p>
-              <ul id="modelScreenList"></ul>
-            </div>
-            <aside class="model-track-panel" id="modelTrackPanel" hidden>
-              <p>Playlist</p>
-              <ul id="modelTrackItems"></ul>
-            </aside>
-            <p class="model-status" id="modelStatus">Loading model...</p>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
-  <script src="./vendor/three.min.js"></script>
-  <script src="./vendor/OrbitControls.js"></script>
-  <script src="./vendor/DRACOLoader.js"></script>
-  <script src="./vendor/GLTFLoader.js"></script>
   <script>
     (() => {
       const slides = [
@@ -2282,7 +2010,6 @@
       const artifactPlaylist = document.getElementById("artifactPlaylist");
       const artifactPlaylistItems = document.getElementById("artifactPlaylistItems");
       const artifactEnter = document.getElementById("artifactEnter");
-      const artifactModelOpen = document.getElementById("artifactModelOpen");
       const artifactSublist = document.getElementById("artifactSublist");
       const artifactSublistTitle = document.getElementById("artifactSublistTitle");
       const artifactSubitems = document.getElementById("artifactSubitems");
@@ -2299,17 +2026,6 @@
       const photoGalleryPrev = document.getElementById("photoGalleryPrev");
       const photoGalleryNext = document.getElementById("photoGalleryNext");
       const photoGalleryClose = document.getElementById("photoGalleryClose");
-      const modelViewer = document.getElementById("modelViewer");
-      const modelViewerTitle = document.getElementById("modelViewerTitle");
-      const modelToggleOn = document.getElementById("modelToggleOn");
-      const modelViewerClose = document.getElementById("modelViewerClose");
-      const modelViewerStage = document.getElementById("modelViewerStage");
-      const modelCanvas = document.getElementById("modelCanvas");
-      const modelScreenOverlay = document.getElementById("modelScreenOverlay");
-      const modelScreenList = document.getElementById("modelScreenList");
-      const modelTrackPanel = document.getElementById("modelTrackPanel");
-      const modelTrackItems = document.getElementById("modelTrackItems");
-      const modelStatus = document.getElementById("modelStatus");
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
       let index = 0;
@@ -2318,23 +2034,9 @@
       let activeArtifactItemIndex = 0;
       let activeArtifactItems = [];
       const imageCache = new Map();
-      let modelScene = null;
-      let modelCamera = null;
-      let modelRenderer = null;
-      let modelControls = null;
-      let loadedModel = null;
-      let modelAnimationId = 0;
-      let modelLoader = null;
-      let activeModelArtifact = null;
-      let currentModelPath = "";
-      let cinematicAnimationId = 0;
-      let modelLocked = false;
-      let lastFitDistance = 3.5;
-      let activeScreenTrackIndex = -1;
       let activePhotoGalleryItems = [];
       let activePhotoGalleryIndex = 0;
       let activeTapeArtifactTitle = "";
-      const poweredArtifacts = new Set();
       const tapeButtonSound = new Audio("tape recorder play stop sound.mp3");
       const placeholderTracks = [
         { title: "Placeholder Track 01", file: "pre-crisis.mp3" },
@@ -3124,9 +2826,6 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
         artifactItemDesc.textContent = artifact.desc;
         renderTapeFeature(artifact);
         renderObjectFeature(artifact);
-        if (artifactModelOpen) {
-          artifactModelOpen.hidden = true;
-        }
         if (artifact.audio) {
           artifactAudioWrap.hidden = false;
           artifactAudioTitle.textContent = artifact.audioTitle || "Object Log Audio";
@@ -3483,430 +3182,6 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
         void artifactAudio.play().catch(() => {});
       }
 
-      function updateScreenTrackActiveState() {
-        [...modelScreenList.querySelectorAll("button")].forEach((btn, idx) => {
-          btn.classList.toggle("is-active", idx === activeScreenTrackIndex);
-        });
-      }
-
-      function populateModelScreenList() {
-        modelScreenList.innerHTML = "";
-        placeholderTracks.forEach((track, idx) => {
-          const li = document.createElement("li");
-          const button = document.createElement("button");
-          button.type = "button";
-          button.textContent = `${String(idx + 1).padStart(2, "0")} - ${track.title}`;
-          button.addEventListener("click", () => {
-            activeScreenTrackIndex = idx;
-            updateScreenTrackActiveState();
-            playPlaceholderTrack(track);
-          });
-          li.appendChild(button);
-          modelScreenList.appendChild(li);
-        });
-        updateScreenTrackActiveState();
-      }
-
-      function renderModelScreenOverlay() {
-        const showOverlay = !!(
-          modelScreenOverlay &&
-          activeModelArtifact &&
-          activeModelArtifact.powerOnPose &&
-          activeModelArtifact.powerOnPose.screenRect &&
-          poweredArtifacts.has(activeModelArtifact.title) &&
-          modelLocked
-        );
-
-        modelScreenOverlay.hidden = !showOverlay;
-        if (!showOverlay) {
-          return;
-        }
-
-        if (!modelScreenList.childElementCount) {
-          populateModelScreenList();
-        }
-
-        const rect = modelCanvas.getBoundingClientRect();
-        const screenRect = activeModelArtifact.powerOnPose.screenRect;
-        const c = screenRect.center;
-        const halfW = (screenRect.widthWorld || 0.2) / 2;
-        const halfH = (screenRect.heightWorld || 0.14) / 2;
-        const centerWorld = new THREE.Vector3(c.x, c.y, c.z);
-
-        // Build a camera-aligned plane at the anchor point so overlay scaling
-        // stays correct regardless of camera direction/aspect.
-        const forward = new THREE.Vector3();
-        modelCamera.getWorldDirection(forward);
-        const rightVec = new THREE.Vector3().crossVectors(forward, modelCamera.up).normalize();
-        const upVec = new THREE.Vector3().crossVectors(rightVec, forward).normalize();
-
-        const rightWorld = centerWorld.clone().add(rightVec.multiplyScalar(halfW));
-        const upWorld = centerWorld.clone().add(upVec.multiplyScalar(halfH));
-
-        const center = centerWorld.clone().project(modelCamera);
-        const right = rightWorld.project(modelCamera);
-        const up = upWorld.project(modelCamera);
-
-        const cx = ((center.x + 1) / 2) * rect.width;
-        const cy = ((-center.y + 1) / 2) * rect.height;
-        const rw = Math.abs((((right.x + 1) / 2) * rect.width) - cx) * 2;
-        const rh = Math.abs((((-up.y + 1) / 2) * rect.height) - cy) * 2;
-
-        const minW = 150;
-        const maxW = Math.min(280, rect.width * 0.52);
-        const w = Math.max(minW, Math.min(maxW, rw));
-        const h = Math.max(92, Math.min(220, rh));
-
-        const clampedX = Math.max(w / 2, Math.min(rect.width - w / 2, cx));
-        const clampedY = Math.max(h / 2, Math.min(rect.height - h / 2, cy));
-
-        modelScreenOverlay.style.left = `${clampedX}px`;
-        modelScreenOverlay.style.top = `${clampedY}px`;
-        modelScreenOverlay.style.width = `${w}px`;
-      }
-
-      function renderModelTrackPanel(artifact) {
-        const showPanel = false;
-        modelTrackPanel.hidden = !showPanel;
-        modelTrackItems.innerHTML = "";
-        modelViewerStage.classList.toggle("has-track-panel", showPanel);
-        if (!showPanel) {
-          return;
-        }
-
-        placeholderTracks.forEach((track, idx) => {
-          const item = document.createElement("li");
-          const button = document.createElement("button");
-          button.type = "button";
-          button.textContent = `${String(idx + 1).padStart(2, "0")} - ${track.title}`;
-          button.addEventListener("click", () => playPlaceholderTrack(track));
-          item.appendChild(button);
-          modelTrackItems.appendChild(item);
-        });
-      }
-
-      function initModelViewer() {
-        if (modelRenderer || typeof THREE === "undefined" || !modelCanvas) {
-          return;
-        }
-        modelScene = new THREE.Scene();
-        modelScene.background = new THREE.Color(0x050403);
-        modelCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
-        modelCamera.position.set(0, 1.4, 4.2);
-
-        const ambient = new THREE.AmbientLight(0xffffff, 0.8);
-        modelScene.add(ambient);
-        const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        keyLight.position.set(2, 4, 3);
-        modelScene.add(keyLight);
-
-        modelRenderer = new THREE.WebGLRenderer({ antialias: true });
-        modelRenderer.setPixelRatio(window.devicePixelRatio || 1);
-        if ("outputColorSpace" in modelRenderer && "SRGBColorSpace" in THREE) {
-          modelRenderer.outputColorSpace = THREE.SRGBColorSpace;
-        } else if ("outputEncoding" in modelRenderer && "sRGBEncoding" in THREE) {
-          modelRenderer.outputEncoding = THREE.sRGBEncoding;
-        }
-        modelCanvas.appendChild(modelRenderer.domElement);
-
-        modelControls = new THREE.OrbitControls(modelCamera, modelRenderer.domElement);
-        modelControls.enableDamping = true;
-        modelControls.dampingFactor = 0.06;
-        modelControls.enablePan = true;
-        modelControls.minDistance = 0.4;
-        modelControls.maxDistance = 30;
-
-        modelLoader = new THREE.GLTFLoader();
-        if (typeof THREE.DRACOLoader !== "undefined") {
-          const dracoLoader = new THREE.DRACOLoader();
-          dracoLoader.setDecoderPath("./vendor/draco/");
-          modelLoader.setDRACOLoader(dracoLoader);
-        }
-      }
-
-      function resizeModelViewer() {
-        if (!modelRenderer || !modelCamera || !modelCanvas) {
-          return;
-        }
-        const rect = modelCanvas.getBoundingClientRect();
-        const width = Math.max(1, Math.floor(rect.width));
-        const height = Math.max(1, Math.floor(rect.height));
-        modelRenderer.setSize(width, height, false);
-        modelCamera.aspect = width / height;
-        modelCamera.updateProjectionMatrix();
-        renderModelScreenOverlay();
-      }
-
-      function getModelViewportMetrics() {
-        if (!modelCanvas) {
-          return { width: 1, height: 1, aspect: 1 };
-        }
-        const rect = modelCanvas.getBoundingClientRect();
-        const width = Math.max(1, rect.width);
-        const height = Math.max(1, rect.height);
-        return { width, height, aspect: width / height };
-      }
-
-      function computeFrameDistance(maxDim, aspect, verticalFovDeg) {
-        const vFov = (verticalFovDeg * Math.PI) / 180;
-        const hFov = 2 * Math.atan(Math.tan(vFov / 2) * Math.max(0.25, aspect));
-        const distV = (maxDim / 2) / Math.tan(vFov / 2);
-        const distH = (maxDim / 2) / Math.tan(hFov / 2);
-        return Math.max(distV, distH);
-      }
-
-      function fitModelToView(object3d) {
-        if (!modelCamera || !modelControls) {
-          return;
-        }
-        const box = new THREE.Box3().setFromObject(object3d);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        const viewport = getModelViewportMetrics();
-        const baseDistance = computeFrameDistance(maxDim, viewport.aspect, modelCamera.fov);
-        const mobileBoost = viewport.width < 900 ? 1.2 : 1.08;
-        const distance = Math.max(baseDistance * mobileBoost, maxDim * 0.95);
-
-        object3d.position.sub(center);
-        modelCamera.position.set(0, maxDim * 0.22, distance);
-        modelCamera.near = Math.max(0.01, distance / 100);
-        modelCamera.far = distance * 100;
-        modelCamera.updateProjectionMatrix();
-        modelControls.target.set(0, 0, 0);
-        modelControls.minDistance = Math.max(distance * 0.18, maxDim * 0.08);
-        modelControls.maxDistance = Math.max(distance * 4.0, maxDim * 2.5);
-        modelControls.update();
-        lastFitDistance = distance;
-      }
-
-      function normalizeModelScale(object3d, targetMaxDim) {
-        if (!object3d || !targetMaxDim) {
-          return;
-        }
-        const box = new THREE.Box3().setFromObject(object3d);
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        const scaleFactor = targetMaxDim / maxDim;
-        object3d.scale.multiplyScalar(scaleFactor);
-      }
-
-      function renderModelFrame() {
-        if (!modelRenderer || !modelScene || !modelCamera || !modelControls) {
-          return;
-        }
-        if (modelControls.enabled) {
-          modelControls.update();
-        }
-        renderModelScreenOverlay();
-        modelRenderer.render(modelScene, modelCamera);
-        modelAnimationId = window.requestAnimationFrame(renderModelFrame);
-      }
-
-      function stopModelFrame() {
-        if (modelAnimationId) {
-          window.cancelAnimationFrame(modelAnimationId);
-          modelAnimationId = 0;
-        }
-      }
-
-      function stopPowerOnCinematic() {
-        if (cinematicAnimationId) {
-          window.cancelAnimationFrame(cinematicAnimationId);
-          cinematicAnimationId = 0;
-        }
-      }
-
-      function runPowerOnCinematic() {
-        if (!loadedModel || !modelCamera || !modelControls) {
-          return;
-        }
-        stopPowerOnCinematic();
-        modelStatus.textContent = "Powering on...";
-        modelControls.enabled = false;
-        modelLocked = false;
-
-        const box = new THREE.Box3().setFromObject(loadedModel);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        const pose = (activeModelArtifact && activeModelArtifact.powerOnPose) || null;
-        if (pose && pose.instantLock) {
-          if (pose.modelPos) {
-            loadedModel.position.set(pose.modelPos.x, pose.modelPos.y, pose.modelPos.z);
-          }
-          loadedModel.rotation.set(
-            typeof pose.x === "number" ? pose.x : loadedModel.rotation.x,
-            typeof pose.y === "number" ? pose.y : loadedModel.rotation.y,
-            typeof pose.z === "number" ? pose.z : loadedModel.rotation.z
-          );
-          if (pose.cameraPos) {
-            modelCamera.position.set(pose.cameraPos.x, pose.cameraPos.y, pose.cameraPos.z);
-          }
-          if (pose.target) {
-            modelControls.target.set(pose.target.x, pose.target.y, pose.target.z);
-          }
-          modelControls.update();
-          modelLocked = true;
-          modelStatus.textContent = "Powered on. View locked.";
-          return;
-        }
-
-        const startPos = modelCamera.position.clone();
-        const startTarget = modelControls.target.clone();
-        const startModelPos = loadedModel.position.clone();
-        const startRotX = loadedModel.rotation.x;
-        const startRotY = loadedModel.rotation.y;
-        const startRotZ = loadedModel.rotation.z;
-        const endRotX = pose && typeof pose.x === "number" ? pose.x : (startRotX - Math.PI * 0.5);
-        const endRotY = pose && typeof pose.y === "number" ? pose.y : startRotY;
-        const endRotZ = pose && typeof pose.z === "number" ? pose.z : startRotZ;
-
-        const viewport = getModelViewportMetrics();
-        const zoomFactor = pose && typeof pose.zoom === "number" ? pose.zoom : 0.22;
-        const zoomFromFit = Math.max(lastFitDistance * zoomFactor, maxDim * 0.14);
-        const narrowBoost = viewport.width < 700 ? 1.25 : 1.0;
-        const zoomDistance = zoomFromFit * narrowBoost;
-        const targetY = size.y * (pose && typeof pose.targetY === "number" ? pose.targetY : 0.05);
-        const endPos = pose && pose.cameraPos
-          ? new THREE.Vector3(pose.cameraPos.x, pose.cameraPos.y, pose.cameraPos.z)
-          : new THREE.Vector3(center.x, center.y + targetY, center.z + zoomDistance);
-        const endTarget = pose && pose.target
-          ? new THREE.Vector3(pose.target.x, pose.target.y, pose.target.z)
-          : new THREE.Vector3(center.x, center.y + targetY, center.z);
-        const endModelPos = pose && pose.modelPos
-          ? new THREE.Vector3(pose.modelPos.x, pose.modelPos.y, pose.modelPos.z)
-          : startModelPos.clone();
-        const startTime = performance.now();
-        const turnMs = 260;
-        const zoomMs = 420;
-
-        const easeOut = (t) => 1 - Math.pow(1 - t, 3);
-
-        const step = (now) => {
-          const elapsed = now - startTime;
-          if (elapsed <= turnMs) {
-            const t = easeOut(Math.min(1, elapsed / turnMs));
-            loadedModel.rotation.x = startRotX + (endRotX - startRotX) * t;
-            loadedModel.rotation.y = startRotY + (endRotY - startRotY) * t;
-            loadedModel.rotation.z = startRotZ + (endRotZ - startRotZ) * t;
-          } else {
-            const t = easeOut(Math.min(1, (elapsed - turnMs) / zoomMs));
-            modelCamera.position.lerpVectors(startPos, endPos, t);
-            modelControls.target.lerpVectors(startTarget, endTarget, t);
-            loadedModel.position.lerpVectors(startModelPos, endModelPos, t);
-            loadedModel.rotation.x = endRotX;
-            loadedModel.rotation.y = endRotY;
-            loadedModel.rotation.z = endRotZ;
-          }
-
-          if (elapsed < turnMs + zoomMs) {
-            cinematicAnimationId = window.requestAnimationFrame(step);
-            return;
-          }
-
-          modelCamera.position.copy(endPos);
-          modelControls.target.copy(endTarget);
-          loadedModel.position.copy(endModelPos);
-          modelLocked = true;
-          modelStatus.textContent = "Powered on. Focus locked on player screen.";
-          stopPowerOnCinematic();
-        };
-
-        cinematicAnimationId = window.requestAnimationFrame(step);
-      }
-
-      function loadModel(path, onLoaded) {
-        if (!modelLoader || !modelScene) {
-          return;
-        }
-        const sourcePath = path.startsWith("./") ? path : `./${path}`;
-        currentModelPath = sourcePath;
-        modelStatus.textContent = "Loading model...";
-
-        if (loadedModel) {
-          modelScene.remove(loadedModel);
-          loadedModel = null;
-        }
-
-        modelLoader.load(
-          sourcePath,
-          (gltf) => {
-            loadedModel = gltf.scene;
-            modelScene.add(loadedModel);
-            if (activeModelArtifact && activeModelArtifact.modelMaxDim) {
-              normalizeModelScale(loadedModel, activeModelArtifact.modelMaxDim);
-            }
-            fitModelToView(loadedModel);
-            modelStatus.textContent = "Drag to rotate, wheel to zoom, right-drag to pan.";
-            if (onLoaded) {
-              onLoaded();
-            }
-          },
-          undefined,
-          (error) => {
-            const message = error && error.message ? error.message : "unknown loader error";
-            modelStatus.textContent = `Could not load "${sourcePath}". ${message}`;
-            console.error("GLB load failed:", error);
-          }
-        );
-      }
-
-      function openModelViewer(path, title, artifact) {
-        initModelViewer();
-        if (!modelRenderer || !modelScene || !modelCamera || typeof THREE.GLTFLoader === "undefined") {
-          modelStatus.textContent = "3D viewer unavailable.";
-          modelViewer.classList.add("is-visible");
-          modelViewer.setAttribute("aria-hidden", "false");
-          return;
-        }
-
-        activeModelArtifact = artifact || null;
-        modelViewerTitle.textContent = title || "Interactive Object";
-        const hasOnModel = !!(activeModelArtifact && activeModelArtifact.modelOn && !poweredArtifacts.has(activeModelArtifact.title));
-        modelToggleOn.hidden = !hasOnModel;
-        modelToggleOn.disabled = false;
-        modelLocked = false;
-        if (modelControls) {
-          modelControls.enabled = true;
-        }
-        modelScreenOverlay.hidden = true;
-        modelScreenList.innerHTML = "";
-        activeScreenTrackIndex = -1;
-        renderModelTrackPanel(activeModelArtifact);
-        modelViewer.classList.add("is-visible");
-        modelViewer.setAttribute("aria-hidden", "false");
-        resizeModelViewer();
-        if (!modelAnimationId) {
-          renderModelFrame();
-        }
-
-        loadModel(path);
-      }
-
-      function closeModelViewer() {
-        modelViewer.classList.remove("is-visible");
-        modelViewer.setAttribute("aria-hidden", "true");
-        modelToggleOn.hidden = true;
-        modelTrackPanel.hidden = true;
-        modelTrackItems.innerHTML = "";
-        modelViewerStage.classList.remove("has-track-panel");
-        modelScreenOverlay.hidden = true;
-        modelScreenList.innerHTML = "";
-        if (activeModelArtifact && activeModelArtifact.title) {
-          poweredArtifacts.delete(activeModelArtifact.title);
-        }
-        activeScreenTrackIndex = -1;
-        activeModelArtifact = null;
-        currentModelPath = "";
-        modelLocked = false;
-        if (modelControls) {
-          modelControls.enabled = true;
-        }
-        stopPowerOnCinematic();
-        stopModelFrame();
-      }
-
       function renderArtifactDial() {
         artifactDialStack.innerHTML = "";
         activeArtifactItems.forEach((artifact, artifactIndex) => {
@@ -3969,7 +3244,6 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
 
       function closeArtifactView() {
         closeArtifactEntry();
-        closeModelViewer();
         artifactAudio.pause();
         activeTapeArtifactTitle = "";
         setTapePlayState(false);
@@ -4065,9 +3339,6 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
         }
         artifactSublist.classList.add("is-visible");
       });
-      if (artifactModelOpen) {
-        artifactModelOpen.addEventListener("click", () => {});
-      }
       artifactReaderClose.addEventListener("click", closeArtifactEntry);
       artifactReader.addEventListener("click", (event) => {
         if (event.target === artifactReader) {
@@ -4080,31 +3351,6 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
       photoGallery.addEventListener("click", (event) => {
         if (event.target === photoGallery) {
           closePhotoGallery();
-        }
-      });
-      modelViewerClose.addEventListener("click", closeModelViewer);
-      modelToggleOn.addEventListener("click", () => {
-        if (!activeModelArtifact || !activeModelArtifact.modelOn) {
-          return;
-        }
-        const targetPath = activeModelArtifact.modelOn;
-        if (currentModelPath === `./${targetPath}`) {
-          return;
-        }
-        loadModel(targetPath, () => {
-          runPowerOnCinematic();
-        });
-        poweredArtifacts.add(activeModelArtifact.title);
-        modelToggleOn.disabled = true;
-        modelToggleOn.hidden = true;
-        renderModelTrackPanel(activeModelArtifact);
-        window.setTimeout(() => {
-          resizeModelViewer();
-        }, 60);
-      });
-      modelViewer.addEventListener("click", (event) => {
-        if (event.target === modelViewer) {
-          closeModelViewer();
         }
       });
       artifactStepUp.addEventListener("click", () => shiftArtifactSelection(-1));
@@ -4126,10 +3372,6 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
         }
         if (artifactReader.classList.contains("is-visible")) {
           closeArtifactEntry();
-          return;
-        }
-        if (modelViewer.classList.contains("is-visible")) {
-          closeModelViewer();
           return;
         }
         if (artifactView.classList.contains("is-visible")) {
@@ -4170,7 +3412,6 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
       updateSignal(slides[0].position);
       window.addEventListener("resize", () => updateSignal(dialPercent));
       window.addEventListener("resize", () => updateArtifactDialPosition(activeArtifactItemIndex));
-      window.addEventListener("resize", resizeModelViewer);
     })();
   </script>
 </body>
