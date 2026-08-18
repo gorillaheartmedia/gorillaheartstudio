@@ -418,6 +418,126 @@
       width:min(76%, 460px);
       transform:translate(-50%, -50%) rotate(2deg);
     }
+    .mp3-player-frame{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:min(76%, 460px);
+      aspect-ratio:812 / 1134;
+      transform:translate(-50%, -50%) rotate(2deg);
+      filter:drop-shadow(0 20px 28px rgba(0,0,0,.58));
+      container-type:inline-size;
+    }
+    .mp3-player-frame .artifact-object-image{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      max-height:none;
+      transform:none;
+      filter:none;
+    }
+    .mp3-screen{
+      position:absolute;
+      left:21.4%;
+      top:9.7%;
+      width:58.8%;
+      height:30.6%;
+      padding:3.4% 4.4% 3.2%;
+      color:#303746;
+      font-family:Consolas, "Courier New", monospace;
+      font-weight:700;
+      letter-spacing:0;
+      text-shadow:0 1px 0 rgba(255,255,255,.16);
+      display:grid;
+      grid-template-rows:auto auto 1fr auto auto;
+      gap:2.8%;
+      pointer-events:none;
+      opacity:.9;
+      mix-blend-mode:multiply;
+    }
+    .mp3-screen-top{
+      display:grid;
+      grid-template-columns:18% 1fr 18%;
+      align-items:center;
+      border-bottom:2px solid rgba(48,55,70,.7);
+      padding-bottom:2.2%;
+      font-size:clamp(8px, 4.5cqw, 21px);
+      line-height:1;
+    }
+    .mp3-screen-play{
+      width:0;
+      height:0;
+      border-top:.45em solid transparent;
+      border-bottom:.45em solid transparent;
+      border-left:.72em solid currentColor;
+    }
+    .mp3-screen-status{
+      text-align:center;
+      font-size:1.08em;
+    }
+    .mp3-screen-battery{
+      justify-self:end;
+      position:relative;
+      width:1.75em;
+      height:.95em;
+      border:.16em solid currentColor;
+      box-sizing:border-box;
+    }
+    .mp3-screen-battery::before{
+      content:"";
+      position:absolute;
+      left:.16em;
+      top:.16em;
+      bottom:.16em;
+      width:58%;
+      background:currentColor;
+    }
+    .mp3-screen-battery::after{
+      content:"";
+      position:absolute;
+      right:-.34em;
+      top:.22em;
+      width:.22em;
+      height:.42em;
+      background:currentColor;
+    }
+    .mp3-screen-count{
+      font-size:clamp(7px, 3.2cqw, 16px);
+      line-height:1;
+    }
+    .mp3-screen-track{
+      align-self:center;
+      text-align:center;
+      font-size:clamp(8px, 3.7cqw, 18px);
+      line-height:1.28;
+    }
+    .mp3-screen-track strong,
+    .mp3-screen-track span{
+      display:block;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .mp3-screen-progress{
+      align-self:end;
+      height:.7em;
+      border:2px solid currentColor;
+      border-radius:.24em;
+      overflow:hidden;
+    }
+    .mp3-screen-progress span{
+      display:block;
+      width:34%;
+      height:100%;
+      background:currentColor;
+    }
+    .mp3-screen-time{
+      display:flex;
+      justify-content:space-between;
+      font-size:clamp(7px, 3.4cqw, 16px);
+      line-height:1;
+    }
     .artifact-tape-play{
       position:absolute;
       left:50%;
@@ -733,6 +853,28 @@
       max-height:calc(100vh - 180px);
       object-fit:contain;
       filter:drop-shadow(0 34px 44px rgba(0,0,0,.64));
+    }
+    .artifact-tape-reader-stage .mp3-player-frame{
+      position:relative;
+      left:auto;
+      top:auto;
+      width:min(78vw, 780px);
+      max-width:100%;
+      max-height:calc(100vh - 180px);
+      transform:rotate(1deg);
+      filter:drop-shadow(0 34px 44px rgba(0,0,0,.64));
+    }
+    .artifact-tape-reader-stage .mp3-screen-top{
+      font-size:clamp(10px, 4.5cqw, 28px);
+    }
+    .artifact-tape-reader-stage .mp3-screen-count{
+      font-size:clamp(9px, 3.2cqw, 22px);
+    }
+    .artifact-tape-reader-stage .mp3-screen-track{
+      font-size:clamp(10px, 3.7cqw, 25px);
+    }
+    .artifact-tape-reader-stage .mp3-screen-time{
+      font-size:clamp(9px, 3.4cqw, 22px);
     }
     .artifact-tape-reader-stage .artifact-tape-play{
       bottom:clamp(18px, 7vh, 72px);
@@ -1775,7 +1917,10 @@
             <button class="artifact-tape-play" id="artifactTapePlay" type="button" aria-label="Play recovered tape">Play Tape</button>
           </div>
           <div class="artifact-object-feature" id="artifactObjectFeature" hidden>
-            <img class="artifact-object-image" id="artifactObjectImage" src="player_default.png" alt="Recovered MP3 player">
+            <div class="mp3-player-frame">
+              <img class="artifact-object-image" id="artifactObjectImage" src="player_default.png" alt="Recovered MP3 player">
+              <div class="mp3-screen" id="artifactObjectScreen" aria-hidden="true"></div>
+            </div>
           </div>
           <div class="artifact-audio" id="artifactAudioWrap" hidden>
             <p id="artifactAudioTitle">Object Log Audio</p>
@@ -2004,6 +2149,7 @@
       const artifactTapePlay = document.getElementById("artifactTapePlay");
       const artifactObjectFeature = document.getElementById("artifactObjectFeature");
       const artifactObjectImage = document.getElementById("artifactObjectImage");
+      const artifactObjectScreen = document.getElementById("artifactObjectScreen");
       const artifactAudioWrap = document.getElementById("artifactAudioWrap");
       const artifactAudioTitle = document.getElementById("artifactAudioTitle");
       const artifactAudio = document.getElementById("artifactAudio");
@@ -2721,7 +2867,17 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
                 objectFeature: {
                   background: "bg_player.png",
                   image: "player_default.png",
-                  imageAlt: "Recovered pre-crisis MP3 player"
+                  imageAlt: "Recovered pre-crisis MP3 player",
+                  interface: {
+                    status: "Now Playing",
+                    count: "1 of 17",
+                    song: "Little Wonder",
+                    artist: "Rob Thomas",
+                    album: "...Something To Be",
+                    elapsed: "1:23",
+                    remaining: "-2:31",
+                    progress: 34
+                  }
                 },
                 facts: {
                   type: "Portable MP3 Player",
@@ -2864,12 +3020,36 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
         if (!object) {
           artifactObjectImage.src = "player_default.png";
           artifactObjectImage.alt = "Recovered object";
+          artifactObjectScreen.innerHTML = "";
           artifactObjectFeature.style.removeProperty("background-image");
           return;
         }
         artifactObjectImage.src = object.image;
         artifactObjectImage.alt = object.imageAlt || artifact.title;
+        artifactObjectScreen.innerHTML = getMp3ScreenMarkup(object.interface);
         artifactObjectFeature.style.backgroundImage = `url("${object.background || "bg_player.png"}")`;
+      }
+
+      function getMp3ScreenMarkup(screen = {}) {
+        const progress = Math.max(0, Math.min(100, Number(screen.progress) || 0));
+        return `
+          <div class="mp3-screen-top">
+            <span class="mp3-screen-play"></span>
+            <span class="mp3-screen-status">${screen.status || "Now Playing"}</span>
+            <span class="mp3-screen-battery"></span>
+          </div>
+          <div class="mp3-screen-count">${screen.count || "1 of 17"}</div>
+          <div class="mp3-screen-track">
+            <strong>${screen.song || "Little Wonder"}</strong>
+            <span>${screen.artist || "Rob Thomas"}</span>
+            <span>${screen.album || "...Something To Be"}</span>
+          </div>
+          <div class="mp3-screen-progress"><span style="width:${progress}%"></span></div>
+          <div class="mp3-screen-time">
+            <span>${screen.elapsed || "1:23"}</span>
+            <span>${screen.remaining || "-2:31"}</span>
+          </div>
+        `;
       }
 
       function openArtifactEntry(subitem, artifact) {
@@ -2994,12 +3174,22 @@ Undead noise stayed outside the east wall. No interior contact tonight, but the 
         const stage = document.createElement("div");
         stage.className = "artifact-tape-reader-stage";
 
+        const frame = document.createElement("div");
+        frame.className = "mp3-player-frame artifact-tape-reader-image";
+
         const image = document.createElement("img");
-        image.className = "artifact-tape-reader-image";
+        image.className = "artifact-object-image";
         image.src = object.image;
         image.alt = object.imageAlt || artifact.title;
 
-        stage.appendChild(image);
+        const screen = document.createElement("div");
+        screen.className = "mp3-screen";
+        screen.setAttribute("aria-hidden", "true");
+        screen.innerHTML = getMp3ScreenMarkup(object.interface);
+
+        frame.appendChild(image);
+        frame.appendChild(screen);
+        stage.appendChild(frame);
         layout.appendChild(copy);
         layout.appendChild(stage);
         artifactReaderBody.appendChild(layout);
