@@ -1,0 +1,14 @@
+.games-page{background-color:#fff}
+.games-page-hero{min-height:auto;overflow:visible;background-color:#0b0b0b;color:#fff;padding:86px 6vw 64px}
+.games-page-inner{width:min(100%,1120px);margin:0 auto}
+.games-page-hero h1{color:#fff;font-family:Impact,"Arial Black",Arial,sans-serif;font-size:clamp(72px,9vw,150px);font-weight:900;line-height:.9;text-transform:uppercase}
+.games-list-section{min-height:auto;overflow:visible;background-color:#fff;padding:72px 6vw}
+.game-project{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(0,1.2fr);align-items:center;gap:clamp(34px,6vw,82px);border-top:8px solid #000;padding-top:28px}
+.game-project-art{width:100%;height:auto;display:block;filter:grayscale(100%);transition:filter .6s ease}
+.game-project:hover .game-project-art{filter:grayscale(0)}
+.game-status{color:#004a98;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:14px;text-transform:uppercase}
+.game-project h2{color:#050505;font-family:Impact,"Arial Black",Arial,sans-serif;font-size:clamp(44px,6vw,88px);font-weight:900;line-height:.95;margin-bottom:24px;text-transform:uppercase}
+.game-project-copy p:not(.game-status){color:#202020;font-size:21px;line-height:1.6}
+.game-project-link{display:inline-flex;align-items:center;justify-content:center;min-height:58px;margin-top:28px;border:2px solid #000;background-color:#000;color:#fff;font-family:Arial,sans-serif;font-size:15px;font-weight:700;padding:16px 22px;text-transform:uppercase;transition:background-color .3s ease,color .3s ease}
+.game-project-link:hover{background-color:#fff;color:#000}
+@media(max-width:760px){.games-page-hero{padding:54px 7vw 42px}.games-list-section{padding:48px 7vw}.game-project{grid-template-columns:1fr}.game-project-copy p:not(.game-status){font-size:17px}.game-project-link{width:100%}}
